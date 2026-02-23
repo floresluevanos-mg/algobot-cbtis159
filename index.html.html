@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlgoBot — CBTIS 159 · Dra. María Flores Luévanos</title>
+<style>
+:root {
+  --bg:#0a0e1a; --surf:#111827; --surf2:#1a2235;
+  --accent:#00e5ff; --accent2:#7c3aed; --green:#10b981;
+  --red:#f43f5e; --yellow:#fbbf24;
+  --text:#e2e8f0; --muted:#64748b; --border:rgba(0,229,255,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);background:rgba(10,14,26,0.97);flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;animation:pulse 2s infinite;}
+.logo-text{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--accent);}
+.badge{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:.62rem;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:1px;}
+.teacher{display:flex;align-items:center;gap:10px;}
+.teacher-info{text-align:right;}
+.teacher-name{font-size:.8rem;color:var(--accent);font-weight:600;}
+.teacher-sub{font-size:.68rem;color:var(--muted);}
+.teacher-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+
+/* STATS */
+.stats-bar{position:relative;z-index:5;display:flex;gap:8px;padding:7px 20px;border-bottom:1px solid var(--border);background:rgba(17,24,39,0.9);overflow-x:auto;flex-shrink:0;}
+.stat-chip{display:flex;align-items:center;gap:5px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:4px 11px;white-space:nowrap;font-size:.74rem;}
+.stat-val{font-family:monospace;color:var(--accent);font-weight:700;}
+.stat-label{color:var(--muted);}
+
+/* LAYOUT */
+.app{position:relative;z-index:5;display:grid;grid-template-columns:250px 1fr 270px;flex:1;min-height:0;}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--border);background:rgba(17,24,39,0.6);overflow-y:auto;padding:12px;}
+.sec-title{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.topic-btn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;transition:all .15s;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
+.topic-btn:hover{background:rgba(255,255,255,0.05);border-color:var(--border);}
+.topic-btn.active{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6);color:var(--accent);}
+.diff{font-size:.6rem;padding:2px 6px;border-radius:10px;font-weight:700;margin-left:auto;}
+.easy{background:rgba(16,185,129,.2);color:var(--green);}
+.med{background:rgba(251,191,36,.2);color:var(--yellow);}
+.hard{background:rgba(244,63,94,.2);color:var(--red);}
+.action-btn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--muted);padding:7px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.79rem;transition:all .15s;margin-bottom:2px;}
+.action-btn:hover{background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text);}
+
+/* CHAT */
+.chat{display:flex;flex-direction:column;overflow:hidden;}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
+.chat-msgs::-webkit-scrollbar{width:4px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.2);border-radius:2px;}
+.msg{display:flex;gap:8px;animation:slideIn .3s ease;}
+.msg.user{flex-direction:row-reverse;}
+.avatar{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.bot-av{background:linear-gradient(135deg,var(--accent2),var(--accent));}
+.user-av{background:linear-gradient(135deg,#374151,#4b5563);}
+.bubble{max-width:73%;padding:10px 14px;border-radius:11px;font-size:.85rem;line-height:1.65;}
+.bot-bubble{background:var(--surf2);border:1px solid var(--border);border-top-left-radius:2px;}
+.user-bubble{background:linear-gradient(135deg,var(--accent2),rgba(124,58,237,.6));border:1px solid rgba(124,58,237,.4);border-top-right-radius:2px;}
+.bubble pre{background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.2);border-radius:7px;padding:10px 13px;font-family:monospace;font-size:.77rem;overflow-x:auto;white-space:pre-wrap;margin:8px 0;color:#e2e8f0;}
+.bubble code{background:rgba(0,229,255,.12);color:var(--accent);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.82em;}
+.typing{display:flex;gap:5px;align-items:center;padding:4px 2px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.4;animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+
+/* INPUT */
+.input-area{padding:10px 14px;border-top:1px solid var(--border);background:rgba(17,24,39,0.9);flex-shrink:0;}
+.quick-btns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.quick-btn{background:var(--surf2);border:1px solid var(--border);color:var(--muted);padding:3px 11px;border-radius:20px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .2s;}
+.quick-btn:hover{border-color:var(--accent);color:var(--accent);}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+textarea{flex:1;background:var(--surf2);border:1px solid rgba(0,229,255,.2);color:var(--text);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:.86rem;resize:none;outline:none;line-height:1.5;max-height:100px;overflow:auto;transition:border-color .2s;}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 14px rgba(0,229,255,.2);}
+.send-btn{width:42px;height:42px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s;}
+.send-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 0 16px rgba(0,229,255,.4);}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* PANEL */
+.panel{border-left:1px solid var(--border);background:rgba(17,24,39,0.6);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.panel::-webkit-scrollbar{width:4px;}
+.panel::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px;}
+.card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.quiz-q{font-size:.83rem;font-weight:600;margin-bottom:10px;line-height:1.45;}
+.quiz-opts{display:flex;flex-direction:column;gap:5px;}
+.quiz-opt{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.78rem;text-align:left;transition:all .15s;}
+.quiz-opt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,229,255,.05);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(16,185,129,.15);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(244,63,94,.15);color:var(--red);}
+.quiz-opt:disabled{cursor:default;}
+.feedback{margin-top:9px;font-size:.77rem;padding:7px 10px;border-radius:7px;display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(16,185,129,.12);border:1px solid var(--green);color:var(--green);}
+.feedback.bad{background:rgba(244,63,94,.12);border:1px solid var(--red);color:var(--red);}
+.next-btn{margin-top:9px;width:100%;padding:7px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;display:none;}
+.next-btn.show{display:block;}
+.result-row{display:flex;justify-content:space-between;font-size:.77rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.result-row:last-child{border:none;}
+.progress-wrap{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 4px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .5s ease;}
+.tag{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.35);color:var(--accent);font-size:.68rem;padding:2px 8px;border-radius:20px;}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;}
+
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 6px rgba(0,229,255,0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:800px){
+  .app{grid-template-columns:1fr;}
+  .sidebar,.panel{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">AlgoBot</span>
+    <span class="badge">CBTIS 159</span>
+  </div>
+  <div class="teacher">
+    <div class="teacher-info">
+      <div class="teacher-name">Dra. María Flores Luévanos</div>
+      <div class="teacher-sub">CBTIS 159 · 2° Semestre · Algoritmos</div>
+    </div>
+    <div class="teacher-avatar">👩‍🏫</div>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-chip"><span class="stat-val" id="s-msgs">0</span><span class="stat-label">Preguntas</span></div>
+  <div class="stat-chip"><span class="stat-val" id="s-quiz">0</span><span class="stat-label">Quiz</span></div>
+  <div class="stat-chip"><span class="stat-val" id="s-pct">0%</span><span class="stat-label">Aciertos</span></div>
+  <div class="stat-chip"><span class="stat-val" id="s-topic">🔤 Algoritmos</span><span class="stat-label">Tema</span></div>
+  <div class="stat-chip"><span class="stat-val" id="s-streak">0🔥</span><span class="stat-label">Racha</span></div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sec-title">📚 Temas</div>
+    <button class="topic-btn active" onclick="selectTopic(this,'Algoritmos básicos','🔤')"><span>🔤</span><span style="flex:1">Algoritmos básicos</span><span class="diff easy">Fácil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Pseudocódigo','📝')"><span>📝</span><span style="flex:1">Pseudocódigo</span><span class="diff easy">Fácil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Diagramas de flujo','🔄')"><span>🔄</span><span style="flex:1">Diagramas de flujo</span><span class="diff easy">Fácil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Variables y tipos de datos','📦')"><span>📦</span><span style="flex:1">Variables y tipos</span><span class="diff easy">Fácil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Estructuras de control','🔀')"><span>🔀</span><span style="flex:1">Estructuras de control</span><span class="diff med">Medio</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Ciclos y bucles','🔁')"><span>🔁</span><span style="flex:1">Ciclos y bucles</span><span class="diff med">Medio</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Arreglos y listas','📋')"><span>📋</span><span style="flex:1">Arreglos y listas</span><span class="diff med">Medio</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Funciones','🧩')"><span>🧩</span><span style="flex:1">Funciones</span><span class="diff hard">Difícil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Búsqueda','🔍')"><span>🔍</span><span style="flex:1">Búsqueda</span><span class="diff hard">Difícil</span></button>
+    <button class="topic-btn" onclick="selectTopic(this,'Ordenamiento','📊')"><span>📊</span><span style="flex:1">Ordenamiento</span><span class="diff hard">Difícil</span></button>
+
+    <div class="sec-title" style="margin-top:14px">⚡ Acciones rápidas</div>
+    <button class="action-btn" onclick="quickAction('ejemplo')">💡 Ver ejemplo del tema</button>
+    <button class="action-btn" onclick="quickAction('inicio')">🎓 Explicar desde cero</button>
+    <button class="action-btn" onclick="quickAction('errores')">⚠️ Errores comunes</button>
+    <button class="action-btn" onclick="quickAction('ejercicio')">✏️ Dame un ejercicio</button>
+  </aside>
+
+  <!-- CHAT -->
+  <main class="chat">
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="input-area">
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="sendMsg('¿Qué es un algoritmo?')">¿Qué es un algoritmo?</button>
+        <button class="quick-btn" onclick="sendMsg('Muéstrame un ejemplo en pseudocódigo')">Ejemplo pseudocódigo</button>
+        <button class="quick-btn" onclick="sendMsg('¿Cómo funciona un ciclo for?')">¿Cómo es un for?</button>
+        <button class="quick-btn" onclick="sendMsg('Dame un ejercicio de práctica')">Ejercicio de práctica</button>
+      </div>
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Escribe tu pregunta aquí... (Enter para enviar)" rows="1"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- PANEL -->
+  <aside class="panel">
+    <div class="card">
+      <div class="sec-title">🧪 Quiz interactivo</div>
+      <div class="quiz-q" id="quizQ">Cargando...</div>
+      <div class="quiz-opts" id="quizOpts"></div>
+      <div class="feedback" id="quizFeedback"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuiz()">Siguiente pregunta →</button>
+    </div>
+
+    <div class="card">
+      <div class="sec-title">📊 Mis resultados</div>
+      <div class="result-row"><span>Preguntas al bot</span><span class="stat-val" id="r-msgs">0</span></div>
+      <div class="result-row"><span>Quiz completados</span><span class="stat-val" id="r-quiz">0</span></div>
+      <div class="result-row"><span>Correctas</span><span class="stat-val" id="r-ok">0</span></div>
+      <div class="result-row"><span>Incorrectas</span><span class="stat-val" id="r-bad">0</span></div>
+      <div style="font-size:.73rem;color:var(--muted);margin-top:10px">Porcentaje de aciertos</div>
+      <div class="progress-wrap"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      <div style="font-family:monospace;font-size:.77rem;color:var(--accent)" id="progLabel">0%</div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div class="sec-title">🔥 Racha actual</div>
+      <div style="font-size:2.2rem;font-family:monospace;color:var(--accent)" id="streakNum">0</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:3px">correctas seguidas</div>
+    </div>
+
+    <div class="card">
+      <div class="sec-title">📌 Temas explorados</div>
+      <div class="tags-wrap" id="exploredTags"><span style="color:var(--muted);font-size:.75rem">Sin temas aún…</span></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// BASE DE CONOCIMIENTO
+// ═══════════════════════════════════════════════════════
+const KB = {
+  "Algoritmos básicos": {
+    intro:`¡Hola! Vamos a ver **Algoritmos básicos** 🔤\n\nUn **algoritmo** es una secuencia de pasos **ordenados, precisos y finitos** que resuelven un problema.\n\n🔑 Características esenciales:\n• **Finito:** Siempre termina\n• **Preciso:** Sin ambigüedades\n• **Entrada:** Puede recibir datos\n• **Salida:** Produce un resultado\n\n📌 Ejemplo cotidiano — Preparar un sándwich:\n1. Tomar dos rebanadas de pan\n2. Untar mayonesa\n3. Agregar el relleno\n4. Colocar la segunda rebanada\n5. ¡Listo! 🥪`,
+    ejemplo:`💡 **Ejemplo: Sumar dos números**\n\n\`\`\`\nINICIO\n  LEER numero1\n  LEER numero2\n  suma <- numero1 + numero2\n  MOSTRAR suma\nFIN\n\`\`\`\n\n✅ Este algoritmo tiene:\n• Entrada: dos números\n• Proceso: sumarlos\n• Salida: el resultado\n• Es finito: termina en el paso 5`,
+    errores:`⚠️ **Errores comunes:**\n\n• Crear ciclos infinitos (sin condición de parada)\n• Pasos ambiguos: "hacer varias veces" sin especificar cuántas\n• Orden incorrecto de los pasos\n• No validar los datos de entrada\n• Olvidar casos especiales (número negativo, división entre cero)`,
+    ejercicio:`✏️ **Ejercicio de práctica:**\n\nEscribe en lenguaje natural un algoritmo para:\n**"Determinar si un número es par o impar"**\n\n💡 Pistas:\n• Lee un número\n• Un número es par si su residuo al dividir entre 2 es 0\n• Muestra el resultado\n\n¡Inténtalo y escribe tu respuesta aquí! 💪`,
+  },
+  "Pseudocódigo": {
+    intro:`¡Vamos con **Pseudocódigo**! 📝\n\nEs un lenguaje intermedio entre el español y la programación. Sirve para **planear algoritmos** sin preocuparte por sintaxis.\n\n📋 Palabras clave:\n• \`INICIO / FIN\` — delimitan el algoritmo\n• \`LEER\` — entrada de datos\n• \`MOSTRAR\` — salida de datos\n• \`<-\` — asignación (guardar valor)\n• \`SI...ENTONCES...SINO\` — decisión\n• \`MIENTRAS\` — ciclo while\n• \`PARA\` — ciclo for`,
+    ejemplo:`💡 **Ejemplo: Calcular promedio y verificar si aprobó**\n\n\`\`\`\nINICIO\n  LEER cal1, cal2, cal3\n  promedio <- (cal1 + cal2 + cal3) / 3\n  SI promedio >= 6 ENTONCES\n    MOSTRAR "¡Aprobado! 🎉"\n  SINO\n    MOSTRAR "Reprobado 😢"\n  FIN SI\nFIN\n\`\`\`\n\n¿Ves lo fácil que se lee? Eso es la ventaja del pseudocódigo 😊`,
+    errores:`⚠️ **Errores comunes en pseudocódigo:**\n\n• Olvidar cerrar estructuras (FIN SI, FIN MIENTRAS)\n• Usar \`==\` para asignar en lugar de \`<-\`\n• Confundir LEER (entrada) con MOSTRAR (salida)\n• No indentar el código (dificulta la lectura)\n• Olvidar declarar variables antes de usarlas`,
+    ejercicio:`✏️ **Ejercicio:** Rellena los espacios en blanco:\n\n**"Pedir la edad y decir si es mayor de edad (18+)"**\n\n\`\`\`\nINICIO\n  LEER ______\n  SI ______ >= ______ ENTONCES\n    MOSTRAR "______"\n  SINO\n    MOSTRAR "______"\n  FIN SI\nFIN\n\`\`\`\n\n¡Escribe tu respuesta y te digo si está correcto! 🎯`,
+  },
+  "Diagramas de flujo": {
+    intro:`¡Los **Diagramas de flujo** son mapas visuales de un algoritmo! 🔄\n\n📐 Figuras principales:\n\n🔵 **Óvalo** → Inicio / Fin\n▭ **Rectángulo** → Proceso o cálculo\n◇ **Rombo** → Decisión (Sí / No)\n▱ **Paralelogramo** → Entrada o Salida\n➡ **Flechas** → Dirección del flujo\n\n✅ Reglas básicas:\n• El flujo va de arriba hacia abajo\n• El rombo SIEMPRE tiene 2 salidas: Sí y No\n• Todas las rutas deben llegar al FIN`,
+    ejemplo:`💡 **Ejemplo: Diagrama para encender la PC**\n\n\`\`\`\n    ( INICIO )\n         ↓\n  [ Presionar botón ]\n         ↓\n  ¿Enciende la PC?\n    ↙ SÍ    NO ↘\n[Usar la PC]  [Revisar cables]\n    ↓               ↓\n         ( FIN )\n\`\`\`\n\n¿Notas cómo el rombo tiene dos caminos? 🎯`,
+    errores:`⚠️ **Errores comunes en diagramas de flujo:**\n\n• Usar figura incorrecta (rectángulo para decisión)\n• Flechas sin dirección o cruzadas\n• Ramas del rombo que no se reconectan al flujo\n• Olvidar el óvalo de INICIO o FIN\n• Caminos "muertos" que no van a ningún lado`,
+    ejercicio:`✏️ **Ejercicio:** Describe las figuras para este algoritmo:\n\n**"Pedir un número, si es positivo mostrarlo al cuadrado, si no mostrar su valor absoluto"**\n\n¿Qué figuras usarías y en qué orden?\n• ¿Cuántos rombos necesitas?\n• ¿Cuántos rectángulos?\n• ¿Cuántos paralelogramos?\n\n¡Dime tu respuesta! 🖊️`,
+  },
+  "Variables y tipos de datos": {
+    intro:`¡Bienvenido a **Variables y tipos de datos**! 📦\n\nUna **variable** es un espacio en memoria que guarda un valor que puede cambiar.\n\nPiénsalo como una caja con etiqueta 📫:\n• La etiqueta = nombre de la variable\n• El contenido = el valor guardado\n\n📊 **Tipos de datos principales:**\n• \`int\` — Enteros: 5, -3, 100\n• \`float\` — Decimales: 3.14, -0.5\n• \`String\` — Texto: "Hola", "CBTIS"\n• \`boolean\` — Verdadero/Falso`,
+    ejemplo:`💡 **Ejemplo de variables en pseudocódigo:**\n\n\`\`\`\nINICIO\n  nombre <- "María"\n  edad <- 17\n  promedio <- 9.5\n  aprobado <- VERDADERO\n\n  MOSTRAR "Alumno: " + nombre\n  MOSTRAR "Edad: " + edad\n  MOSTRAR "Promedio: " + promedio\nFIN\n\`\`\`\n\n¿Identificas los tipos de cada variable? 😊`,
+    errores:`⚠️ **Errores comunes con variables:**\n\n• Usar una variable antes de declararla\n• Guardar texto en variable de tipo número\n• Nombres confusos: usa nombres descriptivos (edad, no x)\n• No inicializar variables (dejarlas sin valor al inicio)\n• Confundir \`=\` (comparar) con \`<-\` (asignar)`,
+    ejercicio:`✏️ **Ejercicio:** Identifica el tipo de dato correcto:\n\n1. Nombre de un alumno → ______\n2. Número de lista → ______\n3. Calificación con decimales → ______\n4. Si está inscrito o no → ______\n5. Código postal → ______\n\n¡Escribe tus respuestas! (int, float, String, boolean)`,
+  },
+  "Estructuras de control": {
+    intro:`¡Vamos con **Estructuras de control**! 🔀\n\nPermiten tomar **decisiones** en el algoritmo según condiciones.\n\n🔹 **SI - SINO (if-else)**\nEjecuta un bloque u otro según si la condición es verdadera o falsa.\n\n🔹 **SI - SINO SI (if-else if)**\nEvalúa múltiples condiciones en cascada.\n\n🔹 **SEGÚN SEA (switch)**\nCompara una variable contra varios valores posibles.`,
+    ejemplo:`💡 **Ejemplo: Calificación en letra**\n\n\`\`\`\nINICIO\n  LEER calificacion\n  SI calificacion >= 9 ENTONCES\n    MOSTRAR "Excelente ⭐"\n  SINO SI calificacion >= 7 ENTONCES\n    MOSTRAR "Bien 👍"\n  SINO SI calificacion >= 6 ENTONCES\n    MOSTRAR "Suficiente ✅"\n  SINO\n    MOSTRAR "Reprobado ❌"\n  FIN SI\nFIN\n\`\`\``,
+    errores:`⚠️ **Errores comunes:**\n\n• Olvidar el FIN SI al cerrar la estructura\n• Condiciones que se sobreponen (ej: >= 6 y >= 7 sin orden correcto)\n• Usar = en vez de == para comparar (en lenguajes como C/Java)\n• No cubrir todos los casos posibles\n• Confundir AND (Y) con OR (O) en condiciones compuestas`,
+    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Pedir la temperatura y decir: Frío (<15), Templado (15-25), Caluroso (>25)"**\n\n¡Usa SI - SINO SI - SINO correctamente! 🌡️`,
+  },
+  "Ciclos y bucles": {
+    intro:`¡Los **Ciclos** son fundamentales en programación! 🔁\n\nPermiten **repetir** instrucciones sin escribirlas varias veces.\n\n🔹 **PARA (for)** — Cuando sabes cuántas veces repetir\n🔹 **MIENTRAS (while)** — Mientras una condición sea verdadera\n🔹 **HACER-MIENTRAS (do-while)** — Se ejecuta AL MENOS UNA VEZ\n\n⚠️ Todo ciclo necesita:\n1. Una variable de control\n2. Una condición de parada\n3. Un incremento o cambio`,
+    ejemplo:`💡 **Ejemplo: Tabla del 5**\n\n\`\`\`\nINICIO\n  PARA i <- 1 HASTA 10 HACER\n    resultado <- 5 * i\n    MOSTRAR "5 x " + i + " = " + resultado\n  FIN PARA\nFIN\n\`\`\`\n\n**Con MIENTRAS:**\n\`\`\`\nINICIO\n  i <- 1\n  MIENTRAS i <= 10 HACER\n    MOSTRAR "5 x " + i + " = " + (5*i)\n    i <- i + 1\n  FIN MIENTRAS\nFIN\n\`\`\`\n\nAmbos hacen lo mismo 😊`,
+    errores:`⚠️ **Errores comunes en ciclos:**\n\n• **Ciclo infinito:** Olvidar incrementar la variable (i <- i + 1)\n• **Off-by-one:** Iterar una vez de más o de menos\n• Condición incorrecta (< en vez de <=)\n• Modificar la variable de control dentro del ciclo accidentalmente\n• Olvidar FIN PARA o FIN MIENTRAS`,
+    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Mostrar los números del 1 al 100 que sean múltiplos de 3"**\n\n💡 Pista: Un número es múltiplo de 3 si residuo(numero, 3) = 0\n\n¡Usa un ciclo PARA y una estructura SI! 🔁`,
+  },
+  "Arreglos y listas": {
+    intro:`¡Los **Arreglos** son colecciones de datos! 📋\n\nUn arreglo almacena **múltiples valores del mismo tipo** bajo un solo nombre, accesibles por su posición (índice).\n\n📌 Características:\n• Los índices empiezan en **0** (en la mayoría de lenguajes)\n• Todos los elementos son del mismo tipo\n• El tamaño generalmente se define al crear el arreglo\n\n\`\`\`\nnotas[0] = 8.5\nnotas[1] = 9.0\nnotas[2] = 7.5\n\`\`\``,
+    ejemplo:`💡 **Ejemplo: Guardar y mostrar 5 calificaciones**\n\n\`\`\`\nINICIO\n  DECLARAR notas[5]\n  PARA i <- 0 HASTA 4 HACER\n    LEER notas[i]\n  FIN PARA\n\n  MOSTRAR "Tus calificaciones:"\n  PARA i <- 0 HASTA 4 HACER\n    MOSTRAR notas[i]\n  FIN PARA\nFIN\n\`\`\`\n\n¿Ves cómo el índice va de 0 a 4 para un arreglo de 5 elementos? 🎯`,
+    errores:`⚠️ **Errores comunes con arreglos:**\n\n• **Index out of bounds:** Acceder a un índice que no existe (ej: notas[5] en arreglo de 5)\n• Olvidar que los índices empiezan en 0\n• No inicializar los valores del arreglo\n• Usar el tamaño incorrecto al declararlo\n• Confundir el índice con el valor almacenado`,
+    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Guardar 10 números en un arreglo y calcular su promedio"**\n\n💡 Pasos:\n1. Declara el arreglo\n2. Lee los 10 números con un ciclo\n3. Suma todos los elementos\n4. Divide entre 10 y muestra el resultado\n\n¡Inténtalo! 📊`,
+  },
+  "Funciones": {
+    intro:`¡Las **Funciones** son bloques de código reutilizables! 🧩\n\nUna función agrupa instrucciones bajo un nombre y se puede llamar las veces que necesites.\n\n🔹 **Partes de una función:**\n• **Nombre:** Cómo la identificamos\n• **Parámetros:** Datos que recibe (entrada)\n• **Cuerpo:** Las instrucciones\n• **Retorno:** El resultado que devuelve\n\n📌 Ventajas:\n• Evita repetir código\n• Facilita el mantenimiento\n• Divide el problema en partes`,
+    ejemplo:`💡 **Ejemplo: Función que calcula el área de un rectángulo**\n\n\`\`\`\nFUNCIÓN calcularArea(base, altura)\n  area <- base * altura\n  RETORNAR area\nFIN FUNCIÓN\n\nINICIO\n  b <- 5\n  h <- 3\n  resultado <- calcularArea(b, h)\n  MOSTRAR "Área = " + resultado\nFIN\n\`\`\`\n\nLa función se define una vez y se puede usar muchas veces 🔄`,
+    errores:`⚠️ **Errores comunes con funciones:**\n\n• Olvidar el RETORNAR cuando la función debe devolver un valor\n• Llamar a la función con parámetros incorrectos\n• Confundir variables locales con globales\n• Crear funciones que hacen demasiadas cosas (cada función debe tener un solo propósito)\n• Olvidar asignar el valor de retorno: resultado <- miFuncion()`,
+    ejercicio:`✏️ **Ejercicio:**\n\nEscribe una función llamada **esMayor** que:\n• Reciba dos números como parámetros\n• Retorne el número más grande\n\nLuego úsala en el programa principal para comparar 3 pares de números.\n\n¡Manos a la obra! 🧩`,
+  },
+  "Búsqueda": {
+    intro:`¡Los **Algoritmos de Búsqueda** encuentran elementos en datos! 🔍\n\n🔹 **Búsqueda Lineal (Secuencial)**\n• Revisa elemento por elemento desde el inicio\n• Funciona en cualquier arreglo (ordenado o no)\n• Complejidad: **O(n)** — revisa hasta n elementos\n\n🔹 **Búsqueda Binaria**\n• Divide el arreglo a la mitad en cada paso\n• ⚠️ Solo funciona en arreglos **ordenados**\n• Complejidad: **O(log n)** — mucho más rápida`,
+    ejemplo:`💡 **Búsqueda Lineal:**\n\`\`\`\nFUNCIÓN buscarLineal(arreglo, objetivo)\n  PARA i <- 0 HASTA longitud(arreglo)-1 HACER\n    SI arreglo[i] = objetivo ENTONCES\n      RETORNAR i  // Posición encontrada\n    FIN SI\n  FIN PARA\n  RETORNAR -1  // No encontrado\nFIN FUNCIÓN\n\`\`\`\n\n💡 **Búsqueda Binaria:**\n\`\`\`\nFUNCIÓN buscarBinaria(arreglo, objetivo)\n  inicio <- 0\n  fin <- longitud(arreglo) - 1\n  MIENTRAS inicio <= fin HACER\n    medio <- (inicio + fin) / 2\n    SI arreglo[medio] = objetivo ENTONCES\n      RETORNAR medio\n    SINO SI arreglo[medio] < objetivo ENTONCES\n      inicio <- medio + 1\n    SINO\n      fin <- medio - 1\n    FIN SI\n  FIN MIENTRAS\n  RETORNAR -1\nFIN FUNCIÓN\n\`\`\``,
+    errores:`⚠️ **Errores comunes:**\n\n• Usar búsqueda binaria en arreglo desordenado\n• Error de índice (inicio/fin fuera de rango)\n• Olvidar actualizar inicio o fin en la búsqueda binaria (ciclo infinito)\n• No manejar el caso donde el elemento no existe (retornar -1)`,
+    ejercicio:`✏️ **Ejercicio:**\n\n¿Cuántos pasos necesita la búsqueda binaria para encontrar el número 50 en este arreglo?\n\n\`\`\`\n[2, 8, 15, 23, 34, 50, 67, 78, 89, 99]\n\`\`\`\n\n💡 Recuerda: cada paso divide el arreglo a la mitad.\n¡Traza el algoritmo paso a paso! 🔍`,
+  },
+  "Ordenamiento": {
+    intro:`¡Los **Algoritmos de Ordenamiento** organizan datos! 📊\n\n🔹 **Bubble Sort (Burbuja)**\n• Compara pares adyacentes e intercambia si están desordenados\n• Complejidad: **O(n²)** — lento en datos grandes\n• Fácil de entender y programar\n\n🔹 **Selection Sort (Selección)**\n• Busca el mínimo y lo coloca al inicio en cada pasada\n• Complejidad: **O(n²)**\n\n🔹 **Insertion Sort (Inserción)**\n• Inserta cada elemento en su posición correcta\n• Eficiente con datos casi ordenados`,
+    ejemplo:`💡 **Bubble Sort paso a paso:**\n\n\`\`\`\nArreglo inicial: [5, 3, 8, 1, 9]\n\nPasada 1:\n[3, 5, 8, 1, 9]  (se intercambian 5 y 3)\n[3, 5, 8, 1, 9]  (5 y 8 están bien)\n[3, 5, 1, 8, 9]  (se intercambian 8 y 1)\n[3, 5, 1, 8, 9]  (8 y 9 están bien)\n\nPasada 2:\n[3, 5, 1, 8, 9]\n[3, 1, 5, 8, 9]  ...\n\nResultado final: [1, 3, 5, 8, 9] ✅\n\`\`\``,
+    errores:`⚠️ **Errores comunes:**\n\n• No completar todas las pasadas necesarias\n• Error en el índice del intercambio (swap)\n• Olvidar la variable temporal para el intercambio:\n  \`\`\`\n  temp <- a[i]\n  a[i] <- a[i+1]\n  a[i+1] <- temp\n  \`\`\`\n• Comparar fuera del rango del arreglo`,
+    ejercicio:`✏️ **Ejercicio:** Aplica Bubble Sort manualmente:\n\n\`\`\`\nArreglo: [7, 2, 9, 4, 1]\n\`\`\`\n\nMuestra el arreglo después de CADA intercambio.\n¿Cuántos intercambios totales necesitaste?\n\n¡Trázalo en papel y dime tu respuesta! 📊`,
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════
+const quizBank = {
+  "Algoritmos básicos":[
+    {q:"¿Qué es un algoritmo?",opts:["Un programa ejecutable","Pasos ordenados para resolver un problema","Un tipo de variable","Un diagrama"],ans:1,exp:"Un algoritmo es una secuencia finita y ordenada de pasos que resuelve un problema."},
+    {q:"¿Cuál es una característica esencial?",opts:["Ser muy largo","Ser preciso y finito","Tener pasos ambiguos","Solo funcionar en PC"],ans:1,exp:"Todo algoritmo debe ser preciso (sin ambigüedades) y finito (debe terminar)."},
+    {q:"¿Cuántas salidas puede tener?",opts:["Exactamente una","Ninguna","Una o más","Solo dos"],ans:2,exp:"Un algoritmo puede tener cero, una o más salidas según el problema."},
+  ],
+  "Pseudocódigo":[
+    {q:"¿Para qué sirve el pseudocódigo?",opts:["Ejecutar programas","Describir algoritmos en lenguaje natural","Diseñar bases de datos","Crear imágenes"],ans:1,exp:"El pseudocódigo describe algoritmos en lenguaje intermedio, sin sintaxis estricta."},
+    {q:"¿Qué símbolo se usa para asignar un valor?",opts:["==","=","<-","=>"],ans:2,exp:"La flecha <- representa asignación: guardamos un valor en una variable."},
+    {q:"¿Qué palabra se usa para mostrar datos?",opts:["RETURN","MOSTRAR o ESCRIBIR","GOTO","RUN"],ans:1,exp:"MOSTRAR, ESCRIBIR o IMPRIMIR se usan para representar la salida de datos."},
+  ],
+  "Diagramas de flujo":[
+    {q:"¿Qué figura representa una decisión?",opts:["Rectángulo","Óvalo","Rombo","Paralelogramo"],ans:2,exp:"El rombo (diamante) representa una condición o decisión en el diagrama."},
+    {q:"¿Qué figura indica inicio o fin?",opts:["Rectángulo","Rombo","Óvalo o cápsula","Flecha"],ans:2,exp:"El óvalo o cápsula marca el inicio y fin del algoritmo."},
+    {q:"¿Qué figura representa un proceso?",opts:["Rombo","Óvalo","Rectángulo","Flecha"],ans:2,exp:"El rectángulo representa una operación o instrucción de procesamiento."},
+  ],
+  "Variables y tipos de datos":[
+    {q:"¿Qué es una variable?",opts:["Un valor fijo","Un espacio en memoria que guarda un valor","Un tipo de ciclo","Una función"],ans:1,exp:"Una variable es un espacio en memoria identificado con un nombre que puede cambiar su valor."},
+    {q:"¿Cuál es un tipo entero?",opts:["3.14","'Hola'","42","Verdadero"],ans:2,exp:"Los números enteros (sin decimales) como 42 son de tipo int."},
+    {q:"¿Qué tipo almacena texto?",opts:["int","float","String","boolean"],ans:2,exp:"El tipo String almacena texto como nombres o frases."},
+  ],
+  "Estructuras de control":[
+    {q:"¿Qué hace SI-SINO?",opts:["Repite código","Toma decisiones según condición","Declara variables","Define funciones"],ans:1,exp:"SI-SINO evalúa una condición y ejecuta un bloque u otro según el resultado."},
+    {q:"¿Cuándo se ejecuta el bloque SI si la condición es FALSA?",opts:["Una vez","Siempre","Nunca","Dos veces"],ans:2,exp:"Si la condición es falsa, el bloque SI no se ejecuta; se pasa al SINO."},
+    {q:"¿Cuándo usamos SEGÚN SEA (switch)?",opts:["Para ciclos","Para múltiples valores posibles","Para funciones","Para arreglos"],ans:1,exp:"SEGÚN SEA es útil cuando una variable puede tomar varios valores distintos."},
+  ],
+  "Ciclos y bucles":[
+    {q:"¿Diferencia entre FOR y WHILE?",opts:["No hay","FOR cuando conoces iteraciones, WHILE cuando no","WHILE es más rápido","FOR solo con números"],ans:1,exp:"FOR se usa cuando conoces el número de repeticiones. WHILE depende de una condición."},
+    {q:"¿Qué es un ciclo infinito?",opts:["Corre infinito veces exactas","La condición de parada nunca se cumple","Un ciclo muy rápido","Un tipo de función"],ans:1,exp:"Un ciclo infinito ocurre cuando su condición de parada nunca se vuelve falsa."},
+    {q:"¿Cuál ciclo se ejecuta al menos una vez?",opts:["FOR","WHILE","DO-WHILE","Ninguno"],ans:2,exp:"El ciclo DO-WHILE ejecuta el bloque primero y verifica la condición al final."},
+  ],
+  "Arreglos y listas":[
+    {q:"¿Qué es un arreglo?",opts:["Un tipo de ciclo","Colección de elementos del mismo tipo","Un operador","Una función"],ans:1,exp:"Un arreglo almacena múltiples valores del mismo tipo accesibles por índice."},
+    {q:"¿Desde qué índice empiezan los arreglos?",opts:["1","0","-1","10"],ans:1,exp:"En Java, Python, C++ y la mayoría de lenguajes, los arreglos comienzan en el índice 0."},
+    {q:"¿Cómo se accede al tercer elemento de 'nums'?",opts:["nums[3]","nums[2]","nums(3)","nums{2}"],ans:1,exp:"El tercer elemento está en el índice 2 (porque se empieza en 0): nums[2]."},
+  ],
+  "Funciones":[
+    {q:"¿Para qué sirve una función?",opts:["Crear variables","Agrupar código reutilizable","Hacer ciclos más rápidos","Definir tipos de datos"],ans:1,exp:"Una función agrupa instrucciones bajo un nombre para reutilizarlas en distintos puntos."},
+    {q:"¿Qué es el valor de retorno?",opts:["El nombre","El resultado que devuelve","Los parámetros","Las líneas de código"],ans:1,exp:"El valor de retorno (RETORNAR) es el resultado que la función entrega a quien la llamó."},
+    {q:"¿Qué son los parámetros?",opts:["El nombre","Variables locales","Datos que recibe la función","El tipo de retorno"],ans:2,exp:"Los parámetros son los datos de entrada que recibe la función para realizar su tarea."},
+  ],
+  "Búsqueda":[
+    {q:"¿Qué hace la búsqueda lineal?",opts:["Divide el arreglo","Revisa elemento por elemento","Ordena primero","Usa fórmula matemática"],ans:1,exp:"La búsqueda lineal recorre el arreglo uno por uno hasta encontrar el elemento."},
+    {q:"¿La búsqueda binaria requiere que el arreglo esté...?",opts:["Desordenado","Ordenado","Vacío","Con pares"],ans:1,exp:"La búsqueda binaria solo funciona en arreglos ordenados."},
+    {q:"¿Cuál es más eficiente en arreglos grandes?",opts:["Lineal siempre","Binaria en arreglos ordenados","Ambas igual","Depende"],ans:1,exp:"La búsqueda binaria es O(log n), mucho más eficiente que la lineal O(n)."},
+  ],
+  "Ordenamiento":[
+    {q:"¿Qué hace Bubble Sort?",opts:["Busca el menor","Compara pares adyacentes e intercambia desordenados","Divide el arreglo","Inserta uno por uno"],ans:1,exp:"Bubble Sort compara elementos vecinos e intercambia los que están en orden incorrecto."},
+    {q:"¿Complejidad de Bubble Sort en el peor caso?",opts:["O(n)","O(log n)","O(n²)","O(1)"],ans:2,exp:"En el peor caso Bubble Sort compara todos los pares posibles: O(n²)."},
+    {q:"¿Qué hace el ordenamiento por Selección?",opts:["Compara vecinos","Encuentra el mínimo y lo coloca al inicio","Divide y conquista","Inserta en posición"],ans:1,exp:"El ordenamiento por Selección busca el mínimo en cada pasada y lo coloca en su posición."},
+  ],
+};
+
+// Respuestas a preguntas frecuentes
+const FAQ = [
+  {keys:["qué es","que es","define","definición","definicion","concepto"],action:"intro"},
+  {keys:["ejemplo","muestra","muéstrame","ilustra","código","pseudocódigo","pseudocodigo"],action:"ejemplo"},
+  {keys:["error","errores","falla","fallas","equivocación","equivocacion","problema","problemas"],action:"errores"},
+  {keys:["ejercicio","practica","práctica","actividad","tarea","problema para"],action:"ejercicio"},
+  {keys:["hola","buenos","buenas","hey","hi"],action:"greet"},
+  {keys:["gracias","thank","excelente","perfecto","entendí","entendi","claro"],action:"thanks"},
+  {keys:["no entiendo","no entendí","no entendi","confundido","confundida","dificil","difícil"],action:"retry"},
+];
+
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+let currentTopic = "Algoritmos básicos";
+let stats = {msgs:0, quizDone:0, correct:0, wrong:0, streak:0};
+let explored = new Set(["Algoritmos básicos"]);
+let quizList = [], quizIdx = 0, currentQ = null;
+
+// ═══════════════════════════════════════════════════════
+// CHAT FUNCTIONS
+// ═══════════════════════════════════════════════════════
+function addMsg(role, text) {
+  const container = document.getElementById("chatMsgs");
+  const div = document.createElement("div");
+  div.className = `msg ${role}`;
+  const isBot = role === "bot";
+  div.innerHTML = `
+    <div class="avatar ${isBot?'bot-av':'user-av'}">${isBot?'🤖':'👤'}</div>
+    <div class="bubble ${isBot?'bot-bubble':'user-bubble'}">${formatText(text)}</div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function formatText(t) {
+  t = t.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\n/g, '<br>');
+  return t;
+}
+
+function showTyping() {
+  const container = document.getElementById("chatMsgs");
+  const div = document.createElement("div");
+  div.className = "msg bot"; div.id = "typing";
+  div.innerHTML = `<div class="avatar bot-av">🤖</div><div class="bubble bot-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById("typing");
+  if(t) t.remove();
+}
+
+function sendMsg(text) {
+  const input = document.getElementById("userInput");
+  const msg = (text || input.value).trim();
+  if(!msg) return;
+  input.value = "";
+  input.style.height = "auto";
+  addMsg("user", msg);
+  stats.msgs++;
+  explored.add(currentTopic);
+  updateStats();
+  updateExplored();
+  document.getElementById("sendBtn").disabled = true;
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    const response = getBotResponse(msg);
+    addMsg("bot", response);
+    document.getElementById("sendBtn").disabled = false;
+  }, 600 + Math.random()*400);
+}
+
+function getBotResponse(msg) {
+  const lower = msg.toLowerCase();
+  // Detectar acción
+  for(const faq of FAQ) {
+    if(faq.keys.some(k => lower.includes(k))) {
+      if(faq.action === "greet") return `¡Hola! 👋 Estoy aquí para ayudarte con **${currentTopic}**.\n¿Qué quieres aprender hoy? Puedes preguntarme cualquier cosa o usar los botones de la izquierda 😊`;
+      if(faq.action === "thanks") return `¡De nada! 😊 Me alegra haberte ayudado.\n¿Hay algo más que quieras saber sobre **${currentTopic}** u otro tema? ¡Estoy aquí! 🚀`;
+      if(faq.action === "retry") return `¡No te preocupes! Lo explicamos de otra forma 💪\n\n${KB[currentTopic]?.intro || "Selecciona un tema en el menú izquierdo y lo explico desde cero."}\n\n¿Quedó más claro? Si no, ¡pregunta lo que sea! 😊`;
+      const data = KB[currentTopic];
+      if(data && data[faq.action]) return data[faq.action];
+    }
+  }
+  // Detectar temas mencionados
+  for(const topic of Object.keys(KB)) {
+    if(lower.includes(topic.toLowerCase())) {
+      return KB[topic].intro;
+    }
+  }
+  // Respuesta del tema actual
+  const data = KB[currentTopic];
+  if(data) {
+    if(lower.includes("para qué") || lower.includes("para que") || lower.includes("sirve") || lower.includes("usa"))
+      return data.intro;
+    return `Sobre **${currentTopic}**, aquí te explico:\n\n${data.intro}\n\n¿Quieres que te dé un ejemplo, hablemos de errores comunes, o prefieres un ejercicio? 😊`;
+  }
+  return `Sobre "${msg}", te recomiendo revisar el tema **${currentTopic}** seleccionado.\n\nPuedes preguntarme:\n• "¿Qué es ${currentTopic}?"\n• "Dame un ejemplo de ${currentTopic}"\n• "¿Cuáles son los errores comunes?"\n• "Dame un ejercicio"\n\n¡Estoy aquí para ayudarte! 🤖`;
+}
+
+function quickAction(type) {
+  const data = KB[currentTopic];
+  if(!data) return;
+  const labels = {intro:"Explícame "+currentTopic, ejemplo:"Dame un ejemplo de "+currentTopic, errores:"¿Cuáles son los errores comunes en "+currentTopic+"?", ejercicio:"Dame un ejercicio de "+currentTopic};
+  addMsg("user", labels[type]);
+  stats.msgs++;
+  explored.add(currentTopic);
+  updateStats();
+  updateExplored();
+  document.getElementById("sendBtn").disabled = true;
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    addMsg("bot", data[type] || data.intro);
+    document.getElementById("sendBtn").disabled = false;
+  }, 500 + Math.random()*300);
+}
+
+// ═══════════════════════════════════════════════════════
+// TOPIC
+// ═══════════════════════════════════════════════════════
+function selectTopic(btn, topic, icon) {
+  document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  currentTopic = topic;
+  explored.add(topic);
+  document.getElementById("s-topic").textContent = icon + " " + topic.split(" ")[0];
+  loadQuiz(topic);
+  updateExplored();
+  addMsg("user", "Quiero aprender sobre " + topic);
+  stats.msgs++;
+  updateStats();
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    addMsg("bot", KB[topic]?.intro || "Tema no disponible aún.");
+  }, 500);
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════
+function loadQuiz(topic) {
+  const key = Object.keys(quizBank).find(k => topic.includes(k) || k.includes(topic.split(" ")[0]));
+  quizList = key ? [...quizBank[key]] : [...quizBank["Algoritmos básicos"]];
+  quizIdx = 0;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  currentQ = quizList[quizIdx];
+  document.getElementById("quizQ").textContent = currentQ.q;
+  const opts = document.getElementById("quizOpts");
+  opts.innerHTML = "";
+  currentQ.opts.forEach((o,i) => {
+    const b = document.createElement("button");
+    b.className = "quiz-opt"; b.textContent = o;
+    b.onclick = () => checkAnswer(i);
+    opts.appendChild(b);
+  });
+  document.getElementById("quizFeedback").className = "feedback";
+  document.getElementById("nextBtn").className = "next-btn";
+}
+
+function checkAnswer(idx) {
+  const opts = document.querySelectorAll(".quiz-opt");
+  opts.forEach(b => b.disabled = true);
+  const ok = idx === currentQ.ans;
+  opts[idx].classList.add(ok ? "correct" : "wrong");
+  if(!ok) opts[currentQ.ans].classList.add("correct");
+  stats.quizDone++;
+  if(ok) { stats.correct++; stats.streak++; }
+  else   { stats.wrong++;   stats.streak = 0; }
+  const fb = document.getElementById("quizFeedback");
+  fb.textContent = (ok ? "✅ ¡Correcto! " : "❌ Incorrecto. ") + currentQ.exp;
+  fb.className = "feedback show " + (ok ? "ok" : "bad");
+  document.getElementById("nextBtn").className = "next-btn show";
+  updateStats();
+}
+
+function nextQuiz() {
+  quizIdx = (quizIdx + 1) % quizList.length;
+  renderQuiz();
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════
+function updateStats() {
+  const pct = stats.quizDone > 0 ? Math.round(stats.correct/stats.quizDone*100) : 0;
+  document.getElementById("s-msgs").textContent    = stats.msgs;
+  document.getElementById("s-quiz").textContent    = stats.quizDone;
+  document.getElementById("s-pct").textContent     = pct + "%";
+  document.getElementById("s-streak").textContent  = stats.streak + "🔥";
+  document.getElementById("r-msgs").textContent    = stats.msgs;
+  document.getElementById("r-quiz").textContent    = stats.quizDone;
+  document.getElementById("r-ok").textContent      = stats.correct;
+  document.getElementById("r-bad").textContent     = stats.wrong;
+  document.getElementById("progFill").style.width  = pct + "%";
+  document.getElementById("progLabel").textContent = pct + "%";
+  document.getElementById("streakNum").textContent = stats.streak;
+}
+
+function updateExplored() {
+  const c = document.getElementById("exploredTags");
+  if(explored.size === 0) return;
+  const icons = {"Algoritmos básicos":"🔤","Pseudocódigo":"📝","Diagramas de flujo":"🔄","Variables y tipos de datos":"📦","Estructuras de control":"🔀","Ciclos y bucles":"🔁","Arreglos y listas":"📋","Funciones":"🧩","Búsqueda":"🔍","Ordenamiento":"📊"};
+  c.innerHTML = "";
+  explored.forEach(t => {
+    const s = document.createElement("span");
+    s.className = "tag";
+    s.textContent = (icons[t]||"📌") + " " + t.split(" ")[0];
+    c.appendChild(s);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+loadQuiz("Algoritmos básicos");
+addMsg("bot", `¡Hola! Soy **AlgoBot** 🤖, el asistente de algoritmos del **CBTIS 159**.\n\nRecurso didáctico de la **Dra. María Flores Luévanos** · 2° Semestre.\n\nPuedo ayudarte a:\n• 📖 **Explicar** cualquier tema de algoritmos\n• 💡 **Mostrar ejemplos** con pseudocódigo\n• 🧪 **Practicar** con el quiz de la derecha\n• ✅ **Resolver** tus dudas\n\n¡Elige un tema en la barra izquierda o escríbeme directamente! 🚀`);
+</script>
+</body>
+</html>
