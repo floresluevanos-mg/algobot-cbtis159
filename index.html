@@ -3,570 +3,925 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AlgoBot — CBTIS 159 · Dra. María Flores Luévanos</title>
+<title>AlgoBot — CBTIS 159</title>
 <style>
-:root {
-  --bg:#0a0e1a; --surf:#111827; --surf2:#1a2235;
-  --accent:#00e5ff; --accent2:#7c3aed; --green:#10b981;
-  --red:#f43f5e; --yellow:#fbbf24;
-  --text:#e2e8f0; --muted:#64748b; --border:rgba(0,229,255,0.15);
-}
+:root{--bg:#0a0e1a;--surf:#111827;--surf2:#1a2235;--accent:#00e5ff;--purple:#7c3aed;--green:#10b981;--red:#f43f5e;--yellow:#fbbf24;--txt:#e2e8f0;--muted:#64748b;--bord:rgba(0,229,255,0.15);}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.lbox{background:var(--surf2);border:1px solid var(--bord);border-radius:20px;padding:40px;width:360px;text-align:center;box-shadow:0 0 60px rgba(0,229,255,.1);}
+.llogo{width:64px;height:64px;background:linear-gradient(135deg,var(--purple),var(--accent));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 16px;animation:pulse 2s infinite;}
+.ltitle{font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.lsub{font-size:.8rem;color:var(--muted);margin-bottom:6px;}
+.ltchr{font-size:.78rem;color:var(--accent);margin-bottom:28px;}
+.llbl{font-size:.8rem;color:var(--muted);text-align:left;margin-bottom:6px;display:block;}
+.linput{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bord);color:var(--txt);border-radius:10px;padding:12px 16px;font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s;margin-bottom:16px;}
+.linput:focus{border-color:var(--accent);}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.95rem;font-weight:700;}
+.lbtn:hover{opacity:.9;}
+.lnote{font-size:.72rem;color:var(--muted);margin-top:14px;}
+
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;z-index:800;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);padding:16px;}
+.overlay.show{display:flex;}
+.mbox{background:var(--surf2);border:1px solid var(--bord);border-radius:16px;padding:30px;width:320px;text-align:center;}
+.mtitle{font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:16px;}
+.mbtn-row{display:flex;gap:8px;margin-top:8px;}
+.mbtn{flex:1;padding:12px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:700;}
+.mbtn-ghost{flex:1;padding:12px;background:transparent;border:1px solid var(--bord);color:var(--muted);border-radius:10px;cursor:pointer;font-family:inherit;font-size:.9rem;}
+
+/* APP */
+#app{display:none;flex-direction:column;height:100vh;}
+#app.show{display:flex;}
 
 /* HEADER */
-header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);background:rgba(10,14,26,0.97);flex-shrink:0;}
-.logo{display:flex;align-items:center;gap:8px;}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;animation:pulse 2s infinite;}
-.logo-text{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--accent);}
-.badge{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:.62rem;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:1px;}
-.teacher{display:flex;align-items:center;gap:10px;}
-.teacher-info{text-align:right;}
-.teacher-name{font-size:.8rem;color:var(--accent);font-weight:600;}
-.teacher-sub{font-size:.68rem;color:var(--muted);}
-.teacher-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--bord);background:rgba(10,14,26,.97);flex-shrink:0;flex-wrap:wrap;gap:6px;}
+.hlogo{display:flex;align-items:center;gap:8px;}
+.hicon{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;animation:pulse 2s infinite;}
+.htxt{font-family:monospace;font-size:1.05rem;font-weight:700;color:var(--accent);}
+.hbadge{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;font-size:.62rem;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:1px;}
+.hright{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.nbadge{background:rgba(0,229,255,.1);border:1px solid var(--bord);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--accent);}
+.ptsbadge{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--yellow);font-weight:700;}
+.tchrbtn{background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);color:#a78bfa;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.75rem;font-weight:600;}
+.tchrbtn:hover{background:rgba(124,58,237,.35);}
+.outbtn{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--red);padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.73rem;}
 
-/* STATS */
-.stats-bar{position:relative;z-index:5;display:flex;gap:8px;padding:7px 20px;border-bottom:1px solid var(--border);background:rgba(17,24,39,0.9);overflow-x:auto;flex-shrink:0;}
-.stat-chip{display:flex;align-items:center;gap:5px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:4px 11px;white-space:nowrap;font-size:.74rem;}
-.stat-val{font-family:monospace;color:var(--accent);font-weight:700;}
-.stat-label{color:var(--muted);}
+/* STATS BAR */
+.sbar{position:relative;z-index:5;display:flex;gap:6px;padding:6px 20px;border-bottom:1px solid var(--bord);background:rgba(17,24,39,.9);overflow-x:auto;flex-shrink:0;}
+.chip{display:flex;align-items:center;gap:4px;background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:4px 10px;white-space:nowrap;font-size:.73rem;}
+.cv{font-family:monospace;color:var(--accent);font-weight:700;}
+.cl{color:var(--muted);}
 
-/* LAYOUT */
-.app{position:relative;z-index:5;display:grid;grid-template-columns:250px 1fr 270px;flex:1;min-height:0;}
+/* MAIN LAYOUT */
+.layout{position:relative;z-index:5;display:grid;grid-template-columns:245px 1fr 268px;flex:1;min-height:0;}
 
 /* SIDEBAR */
-.sidebar{border-right:1px solid var(--border);background:rgba(17,24,39,0.6);overflow-y:auto;padding:12px;}
-.sec-title{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
-.topic-btn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;transition:all .15s;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
-.topic-btn:hover{background:rgba(255,255,255,0.05);border-color:var(--border);}
-.topic-btn.active{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6);color:var(--accent);}
+.sidebar{border-right:1px solid var(--bord);background:rgba(17,24,39,.6);overflow-y:auto;padding:12px;}
+.stitle{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.tbtn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--txt);padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;transition:all .15s;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
+.tbtn:hover{background:rgba(255,255,255,.05);border-color:var(--bord);}
+.tbtn.active{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.6);color:var(--accent);}
 .diff{font-size:.6rem;padding:2px 6px;border-radius:10px;font-weight:700;margin-left:auto;}
 .easy{background:rgba(16,185,129,.2);color:var(--green);}
 .med{background:rgba(251,191,36,.2);color:var(--yellow);}
 .hard{background:rgba(244,63,94,.2);color:var(--red);}
-.action-btn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--muted);padding:7px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.79rem;transition:all .15s;margin-bottom:2px;}
-.action-btn:hover{background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text);}
+.abtn{width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--muted);padding:7px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.79rem;transition:all .15s;margin-bottom:2px;}
+.abtn:hover{background:rgba(255,255,255,.05);border-color:var(--bord);color:var(--txt);}
+.busbtn{width:100%;text-align:left;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.25);color:var(--accent);padding:9px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;margin-bottom:4px;}
+.busbtn:hover{background:rgba(0,229,255,.14);}
+.pinfo{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:10px;margin-top:4px;}
+.ptitle2{font-size:.65rem;font-weight:700;letter-spacing:1px;color:var(--yellow);text-transform:uppercase;margin-bottom:6px;}
+.prow{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 0;}
+.ptot{font-size:1.4rem;font-family:monospace;color:var(--yellow);font-weight:700;text-align:center;margin-top:4px;}
 
 /* CHAT */
 .chat{display:flex;flex-direction:column;overflow:hidden;}
-.chat-msgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
-.chat-msgs::-webkit-scrollbar{width:4px;}
-.chat-msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,0.2);border-radius:2px;}
-.msg{display:flex;gap:8px;animation:slideIn .3s ease;}
+.msgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
+.msgs::-webkit-scrollbar{width:4px;}
+.msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px;}
+.msg{display:flex;gap:8px;animation:fadeUp .3s ease;}
 .msg.user{flex-direction:row-reverse;}
-.avatar{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
-.bot-av{background:linear-gradient(135deg,var(--accent2),var(--accent));}
-.user-av{background:linear-gradient(135deg,#374151,#4b5563);}
-.bubble{max-width:73%;padding:10px 14px;border-radius:11px;font-size:.85rem;line-height:1.65;}
-.bot-bubble{background:var(--surf2);border:1px solid var(--border);border-top-left-radius:2px;}
-.user-bubble{background:linear-gradient(135deg,var(--accent2),rgba(124,58,237,.6));border:1px solid rgba(124,58,237,.4);border-top-right-radius:2px;}
-.bubble pre{background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.2);border-radius:7px;padding:10px 13px;font-family:monospace;font-size:.77rem;overflow-x:auto;white-space:pre-wrap;margin:8px 0;color:#e2e8f0;}
-.bubble code{background:rgba(0,229,255,.12);color:var(--accent);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.82em;}
-.typing{display:flex;gap:5px;align-items:center;padding:4px 2px;}
+.av{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.bav{background:linear-gradient(135deg,var(--purple),var(--accent));}
+.uav{background:linear-gradient(135deg,#374151,#4b5563);}
+.bub{max-width:73%;padding:10px 14px;border-radius:11px;font-size:.85rem;line-height:1.65;}
+.bbub{background:var(--surf2);border:1px solid var(--bord);border-top-left-radius:2px;}
+.ubub{background:linear-gradient(135deg,var(--purple),rgba(124,58,237,.6));border:1px solid rgba(124,58,237,.4);border-top-right-radius:2px;}
+.bub pre{background:rgba(0,0,0,.5);border:1px solid rgba(0,229,255,.2);border-radius:7px;padding:10px 13px;font-family:monospace;font-size:.77rem;overflow-x:auto;white-space:pre-wrap;margin:8px 0;color:#e2e8f0;}
+.bub code{background:rgba(0,229,255,.12);color:var(--accent);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.82em;}
+.typing-wrap{display:flex;gap:5px;align-items:center;padding:4px 2px;}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.4;animation:bounce 1.2s infinite;}
-.dot:nth-child(2){animation-delay:.2s;}
-.dot:nth-child(3){animation-delay:.4s;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+.toast{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);padding:6px 12px;border-radius:20px;font-size:.75rem;font-weight:700;text-align:center;margin:4px auto;animation:fadeUp .3s ease;}
 
 /* INPUT */
-.input-area{padding:10px 14px;border-top:1px solid var(--border);background:rgba(17,24,39,0.9);flex-shrink:0;}
-.quick-btns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
-.quick-btn{background:var(--surf2);border:1px solid var(--border);color:var(--muted);padding:3px 11px;border-radius:20px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .2s;}
-.quick-btn:hover{border-color:var(--accent);color:var(--accent);}
-.input-row{display:flex;gap:8px;align-items:flex-end;}
-textarea{flex:1;background:var(--surf2);border:1px solid rgba(0,229,255,.2);color:var(--text);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:.86rem;resize:none;outline:none;line-height:1.5;max-height:100px;overflow:auto;transition:border-color .2s;}
-textarea:focus{border-color:var(--accent);box-shadow:0 0 14px rgba(0,229,255,.2);}
-.send-btn{width:42px;height:42px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,box-shadow .2s;}
-.send-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 0 16px rgba(0,229,255,.4);}
-.send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.iarea{padding:10px 14px;border-top:1px solid var(--bord);background:rgba(17,24,39,.9);flex-shrink:0;}
+.qbtns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.qbtn{background:var(--surf2);border:1px solid var(--bord);color:var(--muted);padding:3px 11px;border-radius:20px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .2s;}
+.qbtn:hover{border-color:var(--accent);color:var(--accent);}
+.irow{display:flex;gap:8px;align-items:flex-end;}
+textarea{flex:1;background:var(--surf2);border:1px solid rgba(0,229,255,.2);color:var(--txt);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:.86rem;resize:none;outline:none;line-height:1.5;max-height:100px;overflow:auto;transition:border-color .2s;}
+textarea:focus{border-color:var(--accent);}
+.sbtn{width:42px;height:42px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s;}
+.sbtn:hover:not(:disabled){transform:scale(1.05);}
+.sbtn:disabled{opacity:.5;cursor:not-allowed;}
 
-/* PANEL */
-.panel{border-left:1px solid var(--border);background:rgba(17,24,39,0.6);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
-.panel::-webkit-scrollbar{width:4px;}
-.panel::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px;}
-.card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.quiz-q{font-size:.83rem;font-weight:600;margin-bottom:10px;line-height:1.45;}
-.quiz-opts{display:flex;flex-direction:column;gap:5px;}
-.quiz-opt{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.78rem;text-align:left;transition:all .15s;}
-.quiz-opt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,229,255,.05);}
-.quiz-opt.correct{border-color:var(--green);background:rgba(16,185,129,.15);color:var(--green);}
-.quiz-opt.wrong{border-color:var(--red);background:rgba(244,63,94,.15);color:var(--red);}
-.quiz-opt:disabled{cursor:default;}
-.feedback{margin-top:9px;font-size:.77rem;padding:7px 10px;border-radius:7px;display:none;}
-.feedback.show{display:block;}
-.feedback.ok{background:rgba(16,185,129,.12);border:1px solid var(--green);color:var(--green);}
-.feedback.bad{background:rgba(244,63,94,.12);border:1px solid var(--red);color:var(--red);}
-.next-btn{margin-top:9px;width:100%;padding:7px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;display:none;}
-.next-btn.show{display:block;}
-.result-row{display:flex;justify-content:space-between;font-size:.77rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);}
-.result-row:last-child{border:none;}
-.progress-wrap{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 4px;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .5s ease;}
-.tag{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.35);color:var(--accent);font-size:.68rem;padding:2px 8px;border-radius:20px;}
-.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;}
+/* RIGHT PANEL */
+.rpanel{border-left:1px solid var(--bord);background:rgba(17,24,39,.6);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.rpanel::-webkit-scrollbar{width:4px;}
+.rpanel::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px;}
+.card{background:var(--surf2);border:1px solid var(--bord);border-radius:10px;padding:12px;}
+.quizq{font-size:.83rem;font-weight:600;margin-bottom:10px;line-height:1.45;}
+.qopts{display:flex;flex-direction:column;gap:5px;}
+.qopt{background:rgba(255,255,255,.03);border:1px solid var(--bord);color:var(--txt);padding:7px 10px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.78rem;text-align:left;transition:all .15s;}
+.qopt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,229,255,.05);}
+.qopt.ok{border-color:var(--green)!important;background:rgba(16,185,129,.15)!important;color:var(--green)!important;}
+.qopt.bad{border-color:var(--red)!important;background:rgba(244,63,94,.15)!important;color:var(--red)!important;}
+.qopt:disabled{cursor:default;}
+.fb{margin-top:9px;font-size:.77rem;padding:7px 10px;border-radius:7px;display:none;}
+.fb.show{display:block;}
+.fb.fok{background:rgba(16,185,129,.12);border:1px solid var(--green);color:var(--green);}
+.fb.fbad{background:rgba(244,63,94,.12);border:1px solid var(--red);color:var(--red);}
+.nxtbtn{margin-top:9px;width:100%;padding:7px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;display:none;}
+.nxtbtn.show{display:block;}
+.rrow{display:flex;justify-content:space-between;font-size:.77rem;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.rrow:last-child{border:none;}
+.pbar{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 4px;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:3px;transition:width .5s;}
+.tag{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);font-size:.68rem;padding:2px 8px;border-radius:20px;}
+.tags{display:flex;flex-wrap:wrap;gap:5px;}
+
+/* TEACHER PANEL */
+#tpanel{display:none;position:fixed;inset:0;z-index:700;background:var(--bg);flex-direction:column;}
+#tpanel.show{display:flex;}
+.tph{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-bottom:1px solid var(--bord);background:rgba(17,24,39,.97);flex-wrap:wrap;gap:8px;}
+.tptitle{font-size:.95rem;font-weight:700;color:var(--accent);}
+.tpacts{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.tabx{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--muted);padding:6px 13px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:600;transition:all .2s;}
+.tabx.on{background:rgba(0,229,255,.2);border-color:var(--accent);color:var(--accent);}
+.expbtn{background:linear-gradient(135deg,#065f46,#10b981);border:none;color:#fff;padding:7px 13px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.79rem;font-weight:700;}
+.clsbtn{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);color:var(--red);padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.79rem;}
+.tpbody{flex:1;overflow-y:auto;padding:18px 22px;}
+.tpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.tpcard{background:var(--surf2);border:1px solid var(--bord);border-radius:10px;padding:14px;text-align:center;}
+.tpval{font-size:1.7rem;font-family:monospace;color:var(--accent);font-weight:700;}
+.tplbl{font-size:.74rem;color:var(--muted);margin-top:4px;}
+.twrap{background:var(--surf2);border:1px solid var(--bord);border-radius:10px;overflow:auto;}
+.ttable{width:100%;border-collapse:collapse;font-size:.81rem;}
+.ttable th{background:rgba(0,229,255,.1);color:var(--accent);padding:9px 13px;text-align:left;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--bord);white-space:nowrap;}
+.ttable td{padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--txt);white-space:nowrap;}
+.ttable tr:last-child td{border:none;}
+.ttable tr:hover td{background:rgba(255,255,255,.025);}
+.pbadge{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);padding:2px 10px;border-radius:20px;font-weight:700;font-family:monospace;font-size:.82rem;}
+.minibar{display:flex;align-items:center;gap:7px;min-width:90px;}
+.minifill{height:4px;background:rgba(255,255,255,.07);border-radius:2px;flex:1;overflow:hidden;}
+.minifill-inner{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:2px;}
+.nodata{text-align:center;padding:36px;color:var(--muted);font-size:.88rem;}
+.interpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;font-size:.78rem;}
+.icard{border-radius:8px;padding:10px;text-align:center;}
+
+/* BUS-11 */
+#busOverlay{position:fixed;inset:0;z-index:850;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.86);padding:16px;}
+#busOverlay.show{display:flex;}
+.busbox{background:var(--surf2);border:1px solid var(--bord);border-radius:20px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,229,255,.15);}
+.busbox::-webkit-scrollbar{width:4px;}
+.busbox::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px;}
+.bushdr{background:linear-gradient(135deg,var(--purple),rgba(0,180,220,.4));padding:20px 26px;border-radius:20px 20px 0 0;text-align:center;}
+.bustitle{font-size:1.12rem;font-weight:700;color:#fff;margin-bottom:3px;}
+.bussub{font-size:.77rem;color:rgba(255,255,255,.75);}
+.busbody{padding:20px 26px;}
+.busintro{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.14);border-radius:10px;padding:11px;margin-bottom:16px;font-size:.81rem;color:var(--muted);line-height:1.6;}
+.busprog{display:flex;align-items:center;gap:9px;margin-bottom:16px;}
+.busprogbar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+.busproginner{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:3px;transition:width .4s;}
+.busprogtxt{font-size:.74rem;color:var(--accent);font-family:monospace;white-space:nowrap;}
+.busqnum{font-size:.63rem;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:5px;}
+.busqtxt{font-size:.89rem;font-weight:600;color:var(--txt);line-height:1.5;margin-bottom:13px;}
+.busscale{display:flex;gap:5px;margin-bottom:6px;}
+.sbtn2{flex:1;padding:10px 3px;background:rgba(255,255,255,.03);border:2px solid rgba(255,255,255,.08);color:var(--muted);border-radius:8px;cursor:pointer;font-family:monospace;font-size:.95rem;font-weight:700;transition:all .2s;text-align:center;}
+.sbtn2:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.08);}
+.sbtn2.sel{border-color:var(--accent)!important;background:rgba(0,229,255,.2)!important;color:var(--accent)!important;}
+.buslbls{display:flex;justify-content:space-between;margin-bottom:15px;}
+.buslbl{font-size:.61rem;color:var(--muted);max-width:75px;text-align:center;}
+.busnav{display:flex;gap:9px;}
+.busprev{flex:1;padding:11px;background:transparent;border:1px solid var(--bord);color:var(--muted);border-radius:10px;cursor:pointer;font-family:inherit;font-size:.84rem;transition:all .2s;}
+.busprev:hover{border-color:var(--accent);color:var(--accent);}
+.busnext{flex:2;padding:11px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.84rem;font-weight:700;}
+.busnext:disabled{opacity:.4;cursor:not-allowed;}
+.busresult{text-align:center;padding:6px 0;}
+.scorecircle{width:108px;height:108px;border-radius:50%;border:4px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 14px;background:rgba(0,229,255,.07);}
+.scorenum{font-size:1.85rem;font-weight:700;font-family:monospace;color:var(--accent);}
+.scoremax{font-size:.71rem;color:var(--muted);}
+.buslevel{font-size:1rem;font-weight:700;margin-bottom:4px;}
+.busdesc{font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px;}
+.dimcard{background:rgba(255,255,255,.04);border:1px solid var(--bord);border-radius:8px;padding:9px;}
+.dimlbl{font-size:.67rem;color:var(--muted);margin-bottom:3px;}
+.dimval{font-size:1.05rem;font-weight:700;font-family:monospace;color:var(--accent);}
+.busthx{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.14);border-radius:10px;padding:11px;margin-bottom:14px;font-size:.79rem;color:var(--muted);line-height:1.6;text-align:left;}
+.busclose{width:100%;padding:12px;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.93rem;font-weight:700;}
 
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 6px rgba(0,229,255,0)}}
-@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-@media(max-width:800px){
-  .app{grid-template-columns:1fr;}
-  .sidebar,.panel{display:none;}
-}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <span class="logo-text">AlgoBot</span>
-    <span class="badge">CBTIS 159</span>
+<!-- LOGIN -->
+<div id="loginScreen">
+<div class="lbox">
+  <div class="llogo">⚡</div>
+  <div class="ltitle">AlgoBot</div>
+  <div class="lsub">CBTIS 159 · 2° Semestre · Algoritmos</div>
+  <div class="ltchr">👩‍🏫 Dra. María Flores Luévanos</div>
+  <label class="llbl">Ingresa tu nombre completo:</label>
+  <input class="linput" id="nameIn" type="text" placeholder="Ej: Juan Pérez García" onkeydown="if(event.key==='Enter')login()">
+  <button class="lbtn" onclick="login()">Entrar al Chatbot ➤</button>
+  <div class="lnote">🔒 Tu progreso se guarda en esta sesión</div>
+</div>
+</div>
+
+<!-- MODAL CONTRASEÑA -->
+<div class="overlay" id="passModal">
+<div class="mbox">
+  <div class="mtitle">🔐 Acceso Maestra</div>
+  <label class="llbl" style="text-align:left;display:block;margin-bottom:6px">Contraseña:</label>
+  <input class="linput" id="passIn" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPass()">
+  <div id="passErr" style="color:var(--red);font-size:.75rem;margin-bottom:8px;display:none">❌ Contraseña incorrecta</div>
+  <div class="mbtn-row">
+    <button class="mbtn" onclick="checkPass()">Entrar</button>
+    <button class="mbtn-ghost" onclick="closePassModal()">Cancelar</button>
   </div>
-  <div class="teacher">
-    <div class="teacher-info">
-      <div class="teacher-name">Dra. María Flores Luévanos</div>
-      <div class="teacher-sub">CBTIS 159 · 2° Semestre · Algoritmos</div>
+</div>
+</div>
+
+<!-- BUS-11 -->
+<div id="busOverlay">
+<div class="busbox">
+  <div class="bushdr">
+    <div class="bustitle">📋 Cuestionario BUS-11</div>
+    <div class="bussub">Chatbot Usability Scale · AlgoBot CBTIS 159 · Dra. María Flores Luévanos</div>
+  </div>
+  <div class="busbody" id="busContent"></div>
+</div>
+</div>
+
+<!-- PANEL MAESTRA -->
+<div id="tpanel">
+<div class="tph">
+  <div class="tptitle">👩‍🏫 Panel — Dra. María Flores Luévanos · CBTIS 159</div>
+  <div class="tpacts">
+    <button class="tabx on" id="tab1btn" onclick="showTab(1)">📋 Uso y Puntos</button>
+    <button class="tabx" id="tab2btn" onclick="showTab(2)">📊 BUS-11</button>
+    <button class="expbtn" onclick="exportCSV()">⬇️ Exportar CSV</button>
+    <button class="clsbtn" onclick="closeTeacher()">✕ Cerrar</button>
+  </div>
+</div>
+<div class="tpbody">
+
+  <!-- TAB 1 -->
+  <div id="tab1">
+    <div class="tpgrid" id="tpStats"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;">
+      <div style="font-size:.84rem;font-weight:600">📋 Registro de alumnos</div>
+      <div style="font-size:.74rem;color:var(--muted)" id="tpUpd"></div>
     </div>
-    <div class="teacher-avatar">👩‍🏫</div>
+    <div class="twrap">
+      <table class="ttable">
+        <thead><tr>
+          <th>#</th><th>Alumno</th><th>Pts Extra</th><th>Quiz</th>
+          <th>% Aciertos</th><th>Racha Máx</th><th>Preguntas</th>
+          <th>Temas</th><th>BUS-11</th><th>Última Actividad</th>
+        </tr></thead>
+        <tbody id="tpBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="tab2" style="display:none">
+    <div class="tpgrid" id="busStats"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;">
+      <div style="font-size:.84rem;font-weight:600">📊 Resultados BUS-11 por alumno</div>
+      <div style="font-size:.74rem;color:var(--muted)">Máx. 55 pts · Escala Likert 1–5</div>
+    </div>
+    <div class="twrap">
+      <table class="ttable">
+        <thead><tr>
+          <th>Alumno</th><th>Total /55</th><th>Nivel</th>
+          <th>Facilidad /15</th><th>Utilidad /15</th>
+          <th>Satisfacción /15</th><th>Confianza /10</th><th>Fecha</th>
+        </tr></thead>
+        <tbody id="busBody"></tbody>
+      </table>
+    </div>
+    <div class="interpgrid">
+      <div class="icard" style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3)"><div style="color:var(--red);font-weight:700">11–27</div><div style="color:var(--muted);font-size:.71rem">Baja usabilidad</div></div>
+      <div class="icard" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)"><div style="color:var(--yellow);font-weight:700">28–38</div><div style="color:var(--muted);font-size:.71rem">Aceptable</div></div>
+      <div class="icard" style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3)"><div style="color:var(--accent);font-weight:700">39–49</div><div style="color:var(--muted);font-size:.71rem">Buena usabilidad</div></div>
+      <div class="icard" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)"><div style="color:var(--green);font-weight:700">50–55</div><div style="color:var(--muted);font-size:.71rem">Excelente</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<header>
+  <div class="hlogo">
+    <div class="hicon">⚡</div>
+    <span class="htxt">AlgoBot</span>
+    <span class="hbadge">CBTIS 159</span>
+  </div>
+  <div class="hright">
+    <span class="nbadge">👤 <span id="hname">—</span></span>
+    <span class="ptsbadge">⭐ <span id="hpts">0</span> pts</span>
+    <button class="tchrbtn" onclick="openPassModal()">👩‍🏫 Panel Maestra</button>
+    <button class="outbtn" onclick="logout()">Salir</button>
   </div>
 </header>
 
-<div class="stats-bar">
-  <div class="stat-chip"><span class="stat-val" id="s-msgs">0</span><span class="stat-label">Preguntas</span></div>
-  <div class="stat-chip"><span class="stat-val" id="s-quiz">0</span><span class="stat-label">Quiz</span></div>
-  <div class="stat-chip"><span class="stat-val" id="s-pct">0%</span><span class="stat-label">Aciertos</span></div>
-  <div class="stat-chip"><span class="stat-val" id="s-topic">🔤 Algoritmos</span><span class="stat-label">Tema</span></div>
-  <div class="stat-chip"><span class="stat-val" id="s-streak">0🔥</span><span class="stat-label">Racha</span></div>
+<div class="sbar">
+  <div class="chip"><span class="cv" id="sMsgs">0</span><span class="cl">Preguntas</span></div>
+  <div class="chip"><span class="cv" id="sQuiz">0</span><span class="cl">Quiz</span></div>
+  <div class="chip"><span class="cv" id="sPct">0%</span><span class="cl">Aciertos</span></div>
+  <div class="chip"><span class="cv" id="sTopic">🔤 Algoritmos</span><span class="cl">Tema</span></div>
+  <div class="chip"><span class="cv" id="sStrk">0🔥</span><span class="cl">Racha</span></div>
+  <div class="chip"><span class="cv" id="sPts" style="color:var(--yellow)">0⭐</span><span class="cl">Pts Extra</span></div>
 </div>
 
-<div class="app">
+<div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sec-title">📚 Temas</div>
-    <button class="topic-btn active" onclick="selectTopic(this,'Algoritmos básicos','🔤')"><span>🔤</span><span style="flex:1">Algoritmos básicos</span><span class="diff easy">Fácil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Pseudocódigo','📝')"><span>📝</span><span style="flex:1">Pseudocódigo</span><span class="diff easy">Fácil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Diagramas de flujo','🔄')"><span>🔄</span><span style="flex:1">Diagramas de flujo</span><span class="diff easy">Fácil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Variables y tipos de datos','📦')"><span>📦</span><span style="flex:1">Variables y tipos</span><span class="diff easy">Fácil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Estructuras de control','🔀')"><span>🔀</span><span style="flex:1">Estructuras de control</span><span class="diff med">Medio</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Ciclos y bucles','🔁')"><span>🔁</span><span style="flex:1">Ciclos y bucles</span><span class="diff med">Medio</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Arreglos y listas','📋')"><span>📋</span><span style="flex:1">Arreglos y listas</span><span class="diff med">Medio</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Funciones','🧩')"><span>🧩</span><span style="flex:1">Funciones</span><span class="diff hard">Difícil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Búsqueda','🔍')"><span>🔍</span><span style="flex:1">Búsqueda</span><span class="diff hard">Difícil</span></button>
-    <button class="topic-btn" onclick="selectTopic(this,'Ordenamiento','📊')"><span>📊</span><span style="flex:1">Ordenamiento</span><span class="diff hard">Difícil</span></button>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="stitle">📚 Temas</div>
+  <button class="tbtn active" onclick="selTopic(this,'Algoritmos básicos','🔤')"><span>🔤</span><span style="flex:1">Algoritmos básicos</span><span class="diff easy">Fácil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Pseudocódigo','📝')"><span>📝</span><span style="flex:1">Pseudocódigo</span><span class="diff easy">Fácil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Diagramas de flujo','🔄')"><span>🔄</span><span style="flex:1">Diagramas de flujo</span><span class="diff easy">Fácil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Variables y tipos de datos','📦')"><span>📦</span><span style="flex:1">Variables y tipos</span><span class="diff easy">Fácil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Estructuras de control','🔀')"><span>🔀</span><span style="flex:1">Estructuras control</span><span class="diff med">Medio</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Ciclos y bucles','🔁')"><span>🔁</span><span style="flex:1">Ciclos y bucles</span><span class="diff med">Medio</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Arreglos y listas','📋')"><span>📋</span><span style="flex:1">Arreglos y listas</span><span class="diff med">Medio</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Funciones','🧩')"><span>🧩</span><span style="flex:1">Funciones</span><span class="diff hard">Difícil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Búsqueda','🔍')"><span>🔍</span><span style="flex:1">Búsqueda</span><span class="diff hard">Difícil</span></button>
+  <button class="tbtn" onclick="selTopic(this,'Ordenamiento','📊')"><span>📊</span><span style="flex:1">Ordenamiento</span><span class="diff hard">Difícil</span></button>
 
-    <div class="sec-title" style="margin-top:14px">⚡ Acciones rápidas</div>
-    <button class="action-btn" onclick="quickAction('ejemplo')">💡 Ver ejemplo del tema</button>
-    <button class="action-btn" onclick="quickAction('inicio')">🎓 Explicar desde cero</button>
-    <button class="action-btn" onclick="quickAction('errores')">⚠️ Errores comunes</button>
-    <button class="action-btn" onclick="quickAction('ejercicio')">✏️ Dame un ejercicio</button>
-  </aside>
+  <div class="stitle" style="margin-top:13px">⚡ Acciones rápidas</div>
+  <button class="abtn" onclick="quick('intro')">🎓 Explicar desde cero</button>
+  <button class="abtn" onclick="quick('ejemplo')">💡 Ver ejemplo</button>
+  <button class="abtn" onclick="quick('errores')">⚠️ Errores comunes</button>
+  <button class="abtn" onclick="quick('ejercicio')">✏️ Dame un ejercicio</button>
 
-  <!-- CHAT -->
-  <main class="chat">
-    <div class="chat-msgs" id="chatMsgs"></div>
-    <div class="input-area">
-      <div class="quick-btns">
-        <button class="quick-btn" onclick="sendMsg('¿Qué es un algoritmo?')">¿Qué es un algoritmo?</button>
-        <button class="quick-btn" onclick="sendMsg('Muéstrame un ejemplo en pseudocódigo')">Ejemplo pseudocódigo</button>
-        <button class="quick-btn" onclick="sendMsg('¿Cómo funciona un ciclo for?')">¿Cómo es un for?</button>
-        <button class="quick-btn" onclick="sendMsg('Dame un ejercicio de práctica')">Ejercicio de práctica</button>
-      </div>
-      <div class="input-row">
-        <textarea id="userInput" placeholder="Escribe tu pregunta aquí... (Enter para enviar)" rows="1"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
-      </div>
+  <div class="stitle" style="margin-top:13px">📋 Evaluación</div>
+  <button class="busbtn" onclick="openBus()">📋 Responder BUS-11</button>
+
+  <div class="stitle" style="margin-top:13px">⭐ Puntos extra</div>
+  <div class="pinfo">
+    <div class="ptitle2">Sistema de puntos</div>
+    <div class="prow"><span>✅ Quiz correcto</span><span style="color:var(--yellow)">+1 pt</span></div>
+    <div class="prow"><span>🔥 Racha de 3</span><span style="color:var(--yellow)">+2 pts</span></div>
+    <div class="prow"><span>🔥 Racha de 5</span><span style="color:var(--yellow)">+3 pts</span></div>
+    <div class="prow"><span>🏆 Racha de 10</span><span style="color:var(--yellow)">+5 pts</span></div>
+    <div class="ptot" id="sidePts">0 ⭐</div>
+  </div>
+</aside>
+
+<!-- CHAT -->
+<main class="chat">
+  <div class="msgs" id="chatMsgs"></div>
+  <div class="iarea">
+    <div class="qbtns">
+      <button class="qbtn" onclick="send('¿Qué es un algoritmo?')">¿Qué es un algoritmo?</button>
+      <button class="qbtn" onclick="send('Muéstrame un ejemplo en pseudocódigo')">Ejemplo pseudocódigo</button>
+      <button class="qbtn" onclick="send('¿Cómo funciona un ciclo for?')">¿Cómo es un for?</button>
+      <button class="qbtn" onclick="send('Dame un ejercicio de práctica')">Ejercicio de práctica</button>
     </div>
-  </main>
-
-  <!-- PANEL -->
-  <aside class="panel">
-    <div class="card">
-      <div class="sec-title">🧪 Quiz interactivo</div>
-      <div class="quiz-q" id="quizQ">Cargando...</div>
-      <div class="quiz-opts" id="quizOpts"></div>
-      <div class="feedback" id="quizFeedback"></div>
-      <button class="next-btn" id="nextBtn" onclick="nextQuiz()">Siguiente pregunta →</button>
+    <div class="irow">
+      <textarea id="userIn" placeholder="Escribe tu pregunta... (Enter para enviar)" rows="1"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+      <button class="sbtn" id="sendBtn" onclick="send()">➤</button>
     </div>
+  </div>
+</main>
 
-    <div class="card">
-      <div class="sec-title">📊 Mis resultados</div>
-      <div class="result-row"><span>Preguntas al bot</span><span class="stat-val" id="r-msgs">0</span></div>
-      <div class="result-row"><span>Quiz completados</span><span class="stat-val" id="r-quiz">0</span></div>
-      <div class="result-row"><span>Correctas</span><span class="stat-val" id="r-ok">0</span></div>
-      <div class="result-row"><span>Incorrectas</span><span class="stat-val" id="r-bad">0</span></div>
-      <div style="font-size:.73rem;color:var(--muted);margin-top:10px">Porcentaje de aciertos</div>
-      <div class="progress-wrap"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-      <div style="font-family:monospace;font-size:.77rem;color:var(--accent)" id="progLabel">0%</div>
-    </div>
+<!-- PANEL DERECHO -->
+<aside class="rpanel">
+  <div class="card">
+    <div class="stitle">🧪 Quiz interactivo</div>
+    <div class="quizq" id="quizQ">Cargando...</div>
+    <div class="qopts" id="quizOpts"></div>
+    <div class="fb" id="quizFb"></div>
+    <button class="nxtbtn" id="nxtBtn" onclick="nextQ()">Siguiente →</button>
+  </div>
+  <div class="card">
+    <div class="stitle">📊 Mis resultados</div>
+    <div class="rrow"><span>Preguntas al bot</span><span class="cv" id="rMsgs">0</span></div>
+    <div class="rrow"><span>Quiz completados</span><span class="cv" id="rQuiz">0</span></div>
+    <div class="rrow"><span>Correctas</span><span class="cv" id="rOk">0</span></div>
+    <div class="rrow"><span>Incorrectas</span><span class="cv" id="rBad">0</span></div>
+    <div class="rrow"><span>Racha máxima</span><span class="cv" id="rMax">0🔥</span></div>
+    <div style="font-size:.72rem;color:var(--muted);margin-top:9px">% de aciertos</div>
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <div style="font-family:monospace;font-size:.76rem;color:var(--accent)" id="plbl">0%</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="stitle">🔥 Racha actual</div>
+    <div style="font-size:2.1rem;font-family:monospace;color:var(--accent)" id="strkNum">0</div>
+    <div style="font-size:.69rem;color:var(--muted);margin-top:3px">correctas seguidas</div>
+  </div>
+  <div class="card">
+    <div class="stitle">📌 Temas explorados</div>
+    <div class="tags" id="expTags"><span style="color:var(--muted);font-size:.74rem">Sin temas aún…</span></div>
+  </div>
+</aside>
 
-    <div class="card" style="text-align:center">
-      <div class="sec-title">🔥 Racha actual</div>
-      <div style="font-size:2.2rem;font-family:monospace;color:var(--accent)" id="streakNum">0</div>
-      <div style="font-size:.7rem;color:var(--muted);margin-top:3px">correctas seguidas</div>
-    </div>
-
-    <div class="card">
-      <div class="sec-title">📌 Temas explorados</div>
-      <div class="tags-wrap" id="exploredTags"><span style="color:var(--muted);font-size:.75rem">Sin temas aún…</span></div>
-    </div>
-  </aside>
+</div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// BASE DE CONOCIMIENTO
-// ═══════════════════════════════════════════════════════
-const KB = {
-  "Algoritmos básicos": {
-    intro:`¡Hola! Vamos a ver **Algoritmos básicos** 🔤\n\nUn **algoritmo** es una secuencia de pasos **ordenados, precisos y finitos** que resuelven un problema.\n\n🔑 Características esenciales:\n• **Finito:** Siempre termina\n• **Preciso:** Sin ambigüedades\n• **Entrada:** Puede recibir datos\n• **Salida:** Produce un resultado\n\n📌 Ejemplo cotidiano — Preparar un sándwich:\n1. Tomar dos rebanadas de pan\n2. Untar mayonesa\n3. Agregar el relleno\n4. Colocar la segunda rebanada\n5. ¡Listo! 🥪`,
-    ejemplo:`💡 **Ejemplo: Sumar dos números**\n\n\`\`\`\nINICIO\n  LEER numero1\n  LEER numero2\n  suma <- numero1 + numero2\n  MOSTRAR suma\nFIN\n\`\`\`\n\n✅ Este algoritmo tiene:\n• Entrada: dos números\n• Proceso: sumarlos\n• Salida: el resultado\n• Es finito: termina en el paso 5`,
-    errores:`⚠️ **Errores comunes:**\n\n• Crear ciclos infinitos (sin condición de parada)\n• Pasos ambiguos: "hacer varias veces" sin especificar cuántas\n• Orden incorrecto de los pasos\n• No validar los datos de entrada\n• Olvidar casos especiales (número negativo, división entre cero)`,
-    ejercicio:`✏️ **Ejercicio de práctica:**\n\nEscribe en lenguaje natural un algoritmo para:\n**"Determinar si un número es par o impar"**\n\n💡 Pistas:\n• Lee un número\n• Un número es par si su residuo al dividir entre 2 es 0\n• Muestra el resultado\n\n¡Inténtalo y escribe tu respuesta aquí! 💪`,
-  },
-  "Pseudocódigo": {
-    intro:`¡Vamos con **Pseudocódigo**! 📝\n\nEs un lenguaje intermedio entre el español y la programación. Sirve para **planear algoritmos** sin preocuparte por sintaxis.\n\n📋 Palabras clave:\n• \`INICIO / FIN\` — delimitan el algoritmo\n• \`LEER\` — entrada de datos\n• \`MOSTRAR\` — salida de datos\n• \`<-\` — asignación (guardar valor)\n• \`SI...ENTONCES...SINO\` — decisión\n• \`MIENTRAS\` — ciclo while\n• \`PARA\` — ciclo for`,
-    ejemplo:`💡 **Ejemplo: Calcular promedio y verificar si aprobó**\n\n\`\`\`\nINICIO\n  LEER cal1, cal2, cal3\n  promedio <- (cal1 + cal2 + cal3) / 3\n  SI promedio >= 6 ENTONCES\n    MOSTRAR "¡Aprobado! 🎉"\n  SINO\n    MOSTRAR "Reprobado 😢"\n  FIN SI\nFIN\n\`\`\`\n\n¿Ves lo fácil que se lee? Eso es la ventaja del pseudocódigo 😊`,
-    errores:`⚠️ **Errores comunes en pseudocódigo:**\n\n• Olvidar cerrar estructuras (FIN SI, FIN MIENTRAS)\n• Usar \`==\` para asignar en lugar de \`<-\`\n• Confundir LEER (entrada) con MOSTRAR (salida)\n• No indentar el código (dificulta la lectura)\n• Olvidar declarar variables antes de usarlas`,
-    ejercicio:`✏️ **Ejercicio:** Rellena los espacios en blanco:\n\n**"Pedir la edad y decir si es mayor de edad (18+)"**\n\n\`\`\`\nINICIO\n  LEER ______\n  SI ______ >= ______ ENTONCES\n    MOSTRAR "______"\n  SINO\n    MOSTRAR "______"\n  FIN SI\nFIN\n\`\`\`\n\n¡Escribe tu respuesta y te digo si está correcto! 🎯`,
-  },
-  "Diagramas de flujo": {
-    intro:`¡Los **Diagramas de flujo** son mapas visuales de un algoritmo! 🔄\n\n📐 Figuras principales:\n\n🔵 **Óvalo** → Inicio / Fin\n▭ **Rectángulo** → Proceso o cálculo\n◇ **Rombo** → Decisión (Sí / No)\n▱ **Paralelogramo** → Entrada o Salida\n➡ **Flechas** → Dirección del flujo\n\n✅ Reglas básicas:\n• El flujo va de arriba hacia abajo\n• El rombo SIEMPRE tiene 2 salidas: Sí y No\n• Todas las rutas deben llegar al FIN`,
-    ejemplo:`💡 **Ejemplo: Diagrama para encender la PC**\n\n\`\`\`\n    ( INICIO )\n         ↓\n  [ Presionar botón ]\n         ↓\n  ¿Enciende la PC?\n    ↙ SÍ    NO ↘\n[Usar la PC]  [Revisar cables]\n    ↓               ↓\n         ( FIN )\n\`\`\`\n\n¿Notas cómo el rombo tiene dos caminos? 🎯`,
-    errores:`⚠️ **Errores comunes en diagramas de flujo:**\n\n• Usar figura incorrecta (rectángulo para decisión)\n• Flechas sin dirección o cruzadas\n• Ramas del rombo que no se reconectan al flujo\n• Olvidar el óvalo de INICIO o FIN\n• Caminos "muertos" que no van a ningún lado`,
-    ejercicio:`✏️ **Ejercicio:** Describe las figuras para este algoritmo:\n\n**"Pedir un número, si es positivo mostrarlo al cuadrado, si no mostrar su valor absoluto"**\n\n¿Qué figuras usarías y en qué orden?\n• ¿Cuántos rombos necesitas?\n• ¿Cuántos rectángulos?\n• ¿Cuántos paralelogramos?\n\n¡Dime tu respuesta! 🖊️`,
-  },
-  "Variables y tipos de datos": {
-    intro:`¡Bienvenido a **Variables y tipos de datos**! 📦\n\nUna **variable** es un espacio en memoria que guarda un valor que puede cambiar.\n\nPiénsalo como una caja con etiqueta 📫:\n• La etiqueta = nombre de la variable\n• El contenido = el valor guardado\n\n📊 **Tipos de datos principales:**\n• \`int\` — Enteros: 5, -3, 100\n• \`float\` — Decimales: 3.14, -0.5\n• \`String\` — Texto: "Hola", "CBTIS"\n• \`boolean\` — Verdadero/Falso`,
-    ejemplo:`💡 **Ejemplo de variables en pseudocódigo:**\n\n\`\`\`\nINICIO\n  nombre <- "María"\n  edad <- 17\n  promedio <- 9.5\n  aprobado <- VERDADERO\n\n  MOSTRAR "Alumno: " + nombre\n  MOSTRAR "Edad: " + edad\n  MOSTRAR "Promedio: " + promedio\nFIN\n\`\`\`\n\n¿Identificas los tipos de cada variable? 😊`,
-    errores:`⚠️ **Errores comunes con variables:**\n\n• Usar una variable antes de declararla\n• Guardar texto en variable de tipo número\n• Nombres confusos: usa nombres descriptivos (edad, no x)\n• No inicializar variables (dejarlas sin valor al inicio)\n• Confundir \`=\` (comparar) con \`<-\` (asignar)`,
-    ejercicio:`✏️ **Ejercicio:** Identifica el tipo de dato correcto:\n\n1. Nombre de un alumno → ______\n2. Número de lista → ______\n3. Calificación con decimales → ______\n4. Si está inscrito o no → ______\n5. Código postal → ______\n\n¡Escribe tus respuestas! (int, float, String, boolean)`,
-  },
-  "Estructuras de control": {
-    intro:`¡Vamos con **Estructuras de control**! 🔀\n\nPermiten tomar **decisiones** en el algoritmo según condiciones.\n\n🔹 **SI - SINO (if-else)**\nEjecuta un bloque u otro según si la condición es verdadera o falsa.\n\n🔹 **SI - SINO SI (if-else if)**\nEvalúa múltiples condiciones en cascada.\n\n🔹 **SEGÚN SEA (switch)**\nCompara una variable contra varios valores posibles.`,
-    ejemplo:`💡 **Ejemplo: Calificación en letra**\n\n\`\`\`\nINICIO\n  LEER calificacion\n  SI calificacion >= 9 ENTONCES\n    MOSTRAR "Excelente ⭐"\n  SINO SI calificacion >= 7 ENTONCES\n    MOSTRAR "Bien 👍"\n  SINO SI calificacion >= 6 ENTONCES\n    MOSTRAR "Suficiente ✅"\n  SINO\n    MOSTRAR "Reprobado ❌"\n  FIN SI\nFIN\n\`\`\``,
-    errores:`⚠️ **Errores comunes:**\n\n• Olvidar el FIN SI al cerrar la estructura\n• Condiciones que se sobreponen (ej: >= 6 y >= 7 sin orden correcto)\n• Usar = en vez de == para comparar (en lenguajes como C/Java)\n• No cubrir todos los casos posibles\n• Confundir AND (Y) con OR (O) en condiciones compuestas`,
-    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Pedir la temperatura y decir: Frío (<15), Templado (15-25), Caluroso (>25)"**\n\n¡Usa SI - SINO SI - SINO correctamente! 🌡️`,
-  },
-  "Ciclos y bucles": {
-    intro:`¡Los **Ciclos** son fundamentales en programación! 🔁\n\nPermiten **repetir** instrucciones sin escribirlas varias veces.\n\n🔹 **PARA (for)** — Cuando sabes cuántas veces repetir\n🔹 **MIENTRAS (while)** — Mientras una condición sea verdadera\n🔹 **HACER-MIENTRAS (do-while)** — Se ejecuta AL MENOS UNA VEZ\n\n⚠️ Todo ciclo necesita:\n1. Una variable de control\n2. Una condición de parada\n3. Un incremento o cambio`,
-    ejemplo:`💡 **Ejemplo: Tabla del 5**\n\n\`\`\`\nINICIO\n  PARA i <- 1 HASTA 10 HACER\n    resultado <- 5 * i\n    MOSTRAR "5 x " + i + " = " + resultado\n  FIN PARA\nFIN\n\`\`\`\n\n**Con MIENTRAS:**\n\`\`\`\nINICIO\n  i <- 1\n  MIENTRAS i <= 10 HACER\n    MOSTRAR "5 x " + i + " = " + (5*i)\n    i <- i + 1\n  FIN MIENTRAS\nFIN\n\`\`\`\n\nAmbos hacen lo mismo 😊`,
-    errores:`⚠️ **Errores comunes en ciclos:**\n\n• **Ciclo infinito:** Olvidar incrementar la variable (i <- i + 1)\n• **Off-by-one:** Iterar una vez de más o de menos\n• Condición incorrecta (< en vez de <=)\n• Modificar la variable de control dentro del ciclo accidentalmente\n• Olvidar FIN PARA o FIN MIENTRAS`,
-    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Mostrar los números del 1 al 100 que sean múltiplos de 3"**\n\n💡 Pista: Un número es múltiplo de 3 si residuo(numero, 3) = 0\n\n¡Usa un ciclo PARA y una estructura SI! 🔁`,
-  },
-  "Arreglos y listas": {
-    intro:`¡Los **Arreglos** son colecciones de datos! 📋\n\nUn arreglo almacena **múltiples valores del mismo tipo** bajo un solo nombre, accesibles por su posición (índice).\n\n📌 Características:\n• Los índices empiezan en **0** (en la mayoría de lenguajes)\n• Todos los elementos son del mismo tipo\n• El tamaño generalmente se define al crear el arreglo\n\n\`\`\`\nnotas[0] = 8.5\nnotas[1] = 9.0\nnotas[2] = 7.5\n\`\`\``,
-    ejemplo:`💡 **Ejemplo: Guardar y mostrar 5 calificaciones**\n\n\`\`\`\nINICIO\n  DECLARAR notas[5]\n  PARA i <- 0 HASTA 4 HACER\n    LEER notas[i]\n  FIN PARA\n\n  MOSTRAR "Tus calificaciones:"\n  PARA i <- 0 HASTA 4 HACER\n    MOSTRAR notas[i]\n  FIN PARA\nFIN\n\`\`\`\n\n¿Ves cómo el índice va de 0 a 4 para un arreglo de 5 elementos? 🎯`,
-    errores:`⚠️ **Errores comunes con arreglos:**\n\n• **Index out of bounds:** Acceder a un índice que no existe (ej: notas[5] en arreglo de 5)\n• Olvidar que los índices empiezan en 0\n• No inicializar los valores del arreglo\n• Usar el tamaño incorrecto al declararlo\n• Confundir el índice con el valor almacenado`,
-    ejercicio:`✏️ **Ejercicio:**\n\nEscribe el pseudocódigo para:\n**"Guardar 10 números en un arreglo y calcular su promedio"**\n\n💡 Pasos:\n1. Declara el arreglo\n2. Lee los 10 números con un ciclo\n3. Suma todos los elementos\n4. Divide entre 10 y muestra el resultado\n\n¡Inténtalo! 📊`,
-  },
-  "Funciones": {
-    intro:`¡Las **Funciones** son bloques de código reutilizables! 🧩\n\nUna función agrupa instrucciones bajo un nombre y se puede llamar las veces que necesites.\n\n🔹 **Partes de una función:**\n• **Nombre:** Cómo la identificamos\n• **Parámetros:** Datos que recibe (entrada)\n• **Cuerpo:** Las instrucciones\n• **Retorno:** El resultado que devuelve\n\n📌 Ventajas:\n• Evita repetir código\n• Facilita el mantenimiento\n• Divide el problema en partes`,
-    ejemplo:`💡 **Ejemplo: Función que calcula el área de un rectángulo**\n\n\`\`\`\nFUNCIÓN calcularArea(base, altura)\n  area <- base * altura\n  RETORNAR area\nFIN FUNCIÓN\n\nINICIO\n  b <- 5\n  h <- 3\n  resultado <- calcularArea(b, h)\n  MOSTRAR "Área = " + resultado\nFIN\n\`\`\`\n\nLa función se define una vez y se puede usar muchas veces 🔄`,
-    errores:`⚠️ **Errores comunes con funciones:**\n\n• Olvidar el RETORNAR cuando la función debe devolver un valor\n• Llamar a la función con parámetros incorrectos\n• Confundir variables locales con globales\n• Crear funciones que hacen demasiadas cosas (cada función debe tener un solo propósito)\n• Olvidar asignar el valor de retorno: resultado <- miFuncion()`,
-    ejercicio:`✏️ **Ejercicio:**\n\nEscribe una función llamada **esMayor** que:\n• Reciba dos números como parámetros\n• Retorne el número más grande\n\nLuego úsala en el programa principal para comparar 3 pares de números.\n\n¡Manos a la obra! 🧩`,
-  },
-  "Búsqueda": {
-    intro:`¡Los **Algoritmos de Búsqueda** encuentran elementos en datos! 🔍\n\n🔹 **Búsqueda Lineal (Secuencial)**\n• Revisa elemento por elemento desde el inicio\n• Funciona en cualquier arreglo (ordenado o no)\n• Complejidad: **O(n)** — revisa hasta n elementos\n\n🔹 **Búsqueda Binaria**\n• Divide el arreglo a la mitad en cada paso\n• ⚠️ Solo funciona en arreglos **ordenados**\n• Complejidad: **O(log n)** — mucho más rápida`,
-    ejemplo:`💡 **Búsqueda Lineal:**\n\`\`\`\nFUNCIÓN buscarLineal(arreglo, objetivo)\n  PARA i <- 0 HASTA longitud(arreglo)-1 HACER\n    SI arreglo[i] = objetivo ENTONCES\n      RETORNAR i  // Posición encontrada\n    FIN SI\n  FIN PARA\n  RETORNAR -1  // No encontrado\nFIN FUNCIÓN\n\`\`\`\n\n💡 **Búsqueda Binaria:**\n\`\`\`\nFUNCIÓN buscarBinaria(arreglo, objetivo)\n  inicio <- 0\n  fin <- longitud(arreglo) - 1\n  MIENTRAS inicio <= fin HACER\n    medio <- (inicio + fin) / 2\n    SI arreglo[medio] = objetivo ENTONCES\n      RETORNAR medio\n    SINO SI arreglo[medio] < objetivo ENTONCES\n      inicio <- medio + 1\n    SINO\n      fin <- medio - 1\n    FIN SI\n  FIN MIENTRAS\n  RETORNAR -1\nFIN FUNCIÓN\n\`\`\``,
-    errores:`⚠️ **Errores comunes:**\n\n• Usar búsqueda binaria en arreglo desordenado\n• Error de índice (inicio/fin fuera de rango)\n• Olvidar actualizar inicio o fin en la búsqueda binaria (ciclo infinito)\n• No manejar el caso donde el elemento no existe (retornar -1)`,
-    ejercicio:`✏️ **Ejercicio:**\n\n¿Cuántos pasos necesita la búsqueda binaria para encontrar el número 50 en este arreglo?\n\n\`\`\`\n[2, 8, 15, 23, 34, 50, 67, 78, 89, 99]\n\`\`\`\n\n💡 Recuerda: cada paso divide el arreglo a la mitad.\n¡Traza el algoritmo paso a paso! 🔍`,
-  },
-  "Ordenamiento": {
-    intro:`¡Los **Algoritmos de Ordenamiento** organizan datos! 📊\n\n🔹 **Bubble Sort (Burbuja)**\n• Compara pares adyacentes e intercambia si están desordenados\n• Complejidad: **O(n²)** — lento en datos grandes\n• Fácil de entender y programar\n\n🔹 **Selection Sort (Selección)**\n• Busca el mínimo y lo coloca al inicio en cada pasada\n• Complejidad: **O(n²)**\n\n🔹 **Insertion Sort (Inserción)**\n• Inserta cada elemento en su posición correcta\n• Eficiente con datos casi ordenados`,
-    ejemplo:`💡 **Bubble Sort paso a paso:**\n\n\`\`\`\nArreglo inicial: [5, 3, 8, 1, 9]\n\nPasada 1:\n[3, 5, 8, 1, 9]  (se intercambian 5 y 3)\n[3, 5, 8, 1, 9]  (5 y 8 están bien)\n[3, 5, 1, 8, 9]  (se intercambian 8 y 1)\n[3, 5, 1, 8, 9]  (8 y 9 están bien)\n\nPasada 2:\n[3, 5, 1, 8, 9]\n[3, 1, 5, 8, 9]  ...\n\nResultado final: [1, 3, 5, 8, 9] ✅\n\`\`\``,
-    errores:`⚠️ **Errores comunes:**\n\n• No completar todas las pasadas necesarias\n• Error en el índice del intercambio (swap)\n• Olvidar la variable temporal para el intercambio:\n  \`\`\`\n  temp <- a[i]\n  a[i] <- a[i+1]\n  a[i+1] <- temp\n  \`\`\`\n• Comparar fuera del rango del arreglo`,
-    ejercicio:`✏️ **Ejercicio:** Aplica Bubble Sort manualmente:\n\n\`\`\`\nArreglo: [7, 2, 9, 4, 1]\n\`\`\`\n\nMuestra el arreglo después de CADA intercambio.\n¿Cuántos intercambios totales necesitaste?\n\n¡Trázalo en papel y dime tu respuesta! 📊`,
-  },
+// ── KNOWLEDGE BASE ──────────────────────────────────
+var KB = {
+"Algoritmos básicos":{
+  intro:"¡Hola! Vamos con **Algoritmos básicos** 🔤\n\nUn **algoritmo** es una secuencia de pasos **ordenados, precisos y finitos** que resuelven un problema.\n\n🔑 Características:\n• **Finito:** Siempre termina\n• **Preciso:** Sin ambigüedades\n• **Entrada:** Puede recibir datos\n• **Salida:** Produce un resultado\n\n📌 Ejemplo — hacer un sándwich:\n1. Tomar dos rebanadas\n2. Untar mayonesa\n3. Agregar relleno\n4. Colocar segunda rebanada\n5. ¡Listo! 🥪",
+  ejemplo:"💡 **Ejemplo: Sumar dos números**\n```\nINICIO\n  LEER numero1\n  LEER numero2\n  suma <- numero1 + numero2\n  MOSTRAR suma\nFIN\n```\n✅ Tiene entrada, proceso, salida y es finito.",
+  errores:"⚠️ **Errores comunes:**\n• Ciclos infinitos (sin condición de parada)\n• Pasos ambiguos sin especificar\n• Orden incorrecto de pasos\n• No validar datos de entrada\n• Olvidar casos especiales",
+  ejercicio:"✏️ **Ejercicio:**\nEscribe un algoritmo para:\n**Determinar si un número es par o impar**\n\n💡 Pistas:\n• Lee un número\n• Par si residuo entre 2 es 0\n• Muestra el resultado\n\n¡Inténtalo! 💪"
+},
+"Pseudocódigo":{
+  intro:"¡Vamos con **Pseudocódigo**! 📝\n\nEs un lenguaje intermedio entre el español y la programación.\n\n📋 Palabras clave:\n• `INICIO / FIN`\n• `LEER` — entrada de datos\n• `MOSTRAR` — salida de datos\n• `<-` — asignación\n• `SI...ENTONCES...SINO`\n• `MIENTRAS` — ciclo while\n• `PARA` — ciclo for",
+  ejemplo:"💡 **Ejemplo: Promedio y aprobación**\n```\nINICIO\n  LEER cal1, cal2, cal3\n  prom <- (cal1+cal2+cal3)/3\n  SI prom >= 6 ENTONCES\n    MOSTRAR Aprobado\n  SINO\n    MOSTRAR Reprobado\n  FIN SI\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Olvidar FIN SI o FIN MIENTRAS\n• Usar == en vez de <- para asignar\n• Confundir LEER con MOSTRAR\n• No indentar el código",
+  ejercicio:"✏️ **Ejercicio:** Rellena los espacios:\n\n**Pedir edad y decir si es mayor de edad**\n```\nINICIO\n  LEER ______\n  SI ______ >= 18 ENTONCES\n    MOSTRAR ______\n  SINO\n    MOSTRAR ______\n  FIN SI\nFIN\n```"
+},
+"Diagramas de flujo":{
+  intro:"¡Los **Diagramas de flujo** son mapas visuales! 🔄\n\n📐 Figuras:\n• Óvalo → Inicio/Fin\n• Rectángulo → Proceso\n• Rombo → Decisión (Sí/No)\n• Paralelogramo → Entrada/Salida\n• Flechas → Dirección\n\n✅ El rombo SIEMPRE tiene 2 salidas.",
+  ejemplo:"💡 **Ejemplo simplificado:**\n```\n(INICIO)\n    ↓\n[Presionar botón]\n    ↓\n¿Enciende?\nSÍ ↙   NO ↘\n[Usar]  [Revisar]\n    ↓       ↓\n   (FIN)\n```",
+  errores:"⚠️ **Errores comunes:**\n• Usar figura incorrecta\n• Flechas sin dirección clara\n• Ramas del rombo sin reconectar\n• Olvidar INICIO o FIN\n• Caminos sin salida",
+  ejercicio:"✏️ **Ejercicio:** Describe las figuras para:\n**Pedir número; si positivo mostrarlo al cuadrado, si no su valor absoluto**\n\n¿Cuántos rombos, rectángulos y paralelogramos necesitas?"
+},
+"Variables y tipos de datos":{
+  intro:"¡**Variables y tipos de datos**! 📦\n\nUna **variable** es un espacio en memoria que guarda un valor.\n\n📊 Tipos principales:\n• `int` — Enteros: 5, -3, 100\n• `float` — Decimales: 3.14\n• `String` — Texto: Hola\n• `boolean` — Verdadero/Falso",
+  ejemplo:"💡 **Ejemplo:**\n```\nINICIO\n  nombre <- María\n  edad <- 17\n  promedio <- 9.5\n  aprobado <- VERDADERO\n  MOSTRAR nombre + tiene + edad + años\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Usar variable antes de declararla\n• Guardar texto en variable numérica\n• Nombres poco descriptivos\n• No inicializar variables",
+  ejercicio:"✏️ **Ejercicio:** Indica el tipo de dato correcto:\n1. Nombre del alumno → ______\n2. Número de lista → ______\n3. Calificación con decimales → ______\n4. ¿Está inscrito? → ______"
+},
+"Estructuras de control":{
+  intro:"¡**Estructuras de control**! 🔀\n\nPermiten tomar **decisiones** en el algoritmo.\n\n🔹 **SI - SINO** — Condición simple\n🔹 **SI - SINO SI** — Múltiples condiciones\n🔹 **SEGÚN SEA** — Múltiples valores posibles",
+  ejemplo:"💡 **Ejemplo: Calificación en letra**\n```\nINICIO\n  LEER cal\n  SI cal >= 9 ENTONCES\n    MOSTRAR Excelente\n  SINO SI cal >= 7 ENTONCES\n    MOSTRAR Bien\n  SINO SI cal >= 6 ENTONCES\n    MOSTRAR Suficiente\n  SINO\n    MOSTRAR Reprobado\n  FIN SI\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Olvidar FIN SI\n• Condiciones que se sobreponen\n• Usar = en vez de == para comparar\n• No cubrir todos los casos",
+  ejercicio:"✏️ **Ejercicio:** Escribe pseudocódigo para:\n**Temperatura: Frío (menos de 15), Templado (15-25), Caluroso (más de 25)**"
+},
+"Ciclos y bucles":{
+  intro:"¡**Ciclos y bucles**! 🔁\n\nRepiten instrucciones automáticamente.\n\n🔹 **PARA** — Cuando sabes cuántas veces\n🔹 **MIENTRAS** — Mientras condición sea verdadera\n🔹 **HACER-MIENTRAS** — Al menos una vez\n\n⚠️ Todo ciclo necesita: variable de control, condición y cambio.",
+  ejemplo:"💡 **Ejemplo: Tabla del 5**\n```\nINICIO\n  PARA i <- 1 HASTA 10 HACER\n    MOSTRAR 5 x i = (5*i)\n  FIN PARA\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Ciclo infinito (olvidar i <- i+1)\n• Off-by-one (una iteración de más)\n• Condición incorrecta\n• Olvidar FIN PARA o FIN MIENTRAS",
+  ejercicio:"✏️ **Ejercicio:** Escribe pseudocódigo para:\n**Mostrar múltiplos de 3 del 1 al 100**\n\nUsa un ciclo PARA con estructura SI."
+},
+"Arreglos y listas":{
+  intro:"¡**Arreglos y listas**! 📋\n\nAlmacenan **múltiples valores del mismo tipo** bajo un nombre.\n\n📌 Características:\n• Índices empiezan en **0**\n• Mismo tipo de dato\n• Acceso: notas[0], notas[1]...",
+  ejemplo:"💡 **Ejemplo: 5 calificaciones**\n```\nINICIO\n  DECLARAR notas[5]\n  PARA i <- 0 HASTA 4 HACER\n    LEER notas[i]\n  FIN PARA\n  PARA i <- 0 HASTA 4 HACER\n    MOSTRAR notas[i]\n  FIN PARA\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Index out of bounds\n• Olvidar que índices empiezan en 0\n• No inicializar el arreglo\n• Tamaño incorrecto al declarar",
+  ejercicio:"✏️ **Ejercicio:** Escribe pseudocódigo para:\n**Guardar 10 números y calcular su promedio**"
+},
+"Funciones":{
+  intro:"¡**Funciones**! 🧩\n\nAgrupan código reutilizable bajo un nombre.\n\n🔹 Partes de una función:\n• **Nombre** — Identificador\n• **Parámetros** — Datos de entrada\n• **Cuerpo** — Instrucciones\n• **Retorno** — Resultado que devuelve",
+  ejemplo:"💡 **Ejemplo: Área de rectángulo**\n```\nFUNCIÓN calcArea(base, altura)\n  area <- base * altura\n  RETORNAR area\nFIN FUNCIÓN\n\nINICIO\n  r <- calcArea(5, 3)\n  MOSTRAR Área = r\nFIN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Olvidar RETORNAR\n• Parámetros incorrectos al llamar\n• Confundir variables locales con globales\n• Funciones que hacen demasiadas cosas",
+  ejercicio:"✏️ **Ejercicio:** Crea una función **esMayor(a, b)** que retorne el número más grande. Úsala para comparar 3 pares de números."
+},
+"Búsqueda":{
+  intro:"¡**Algoritmos de Búsqueda**! 🔍\n\n🔹 **Búsqueda Lineal**\n• Revisa elemento por elemento\n• Funciona en cualquier arreglo\n• Complejidad: O(n)\n\n🔹 **Búsqueda Binaria**\n• Divide el arreglo a la mitad\n• Solo en arreglos **ordenados**\n• Complejidad: O(log n)",
+  ejemplo:"💡 **Búsqueda Lineal:**\n```\nFUNCIÓN buscarLineal(arr, objetivo)\n  PARA i <- 0 HASTA longitud(arr)-1\n    SI arr[i] = objetivo ENTONCES\n      RETORNAR i\n    FIN SI\n  FIN PARA\n  RETORNAR -1\nFIN FUNCIÓN\n```",
+  errores:"⚠️ **Errores comunes:**\n• Usar binaria en arreglo desordenado\n• Error de índice fuera de rango\n• Olvidar actualizar inicio/fin en binaria\n• No manejar el caso no encontrado",
+  ejercicio:"✏️ **Ejercicio:** ¿Cuántos pasos necesita la búsqueda binaria para encontrar el 50?\n\n[2, 8, 15, 23, 34, 50, 67, 78, 89, 99]\n\n¡Traza el algoritmo paso a paso!"
+},
+"Ordenamiento":{
+  intro:"¡**Algoritmos de Ordenamiento**! 📊\n\n🔹 **Bubble Sort** — Compara pares adyacentes. O(n²)\n🔹 **Selection Sort** — Busca el mínimo. O(n²)\n🔹 **Insertion Sort** — Inserta en posición. O(n²)",
+  ejemplo:"💡 **Bubble Sort:**\n```\nInicial: [5, 3, 8, 1]\n\nPasada 1:\n[3,5,8,1] -> [3,5,1,8]\n\nPasada 2:\n[3,1,5,8]\n\nPasada 3:\n[1,3,5,8] OK\n```",
+  errores:"⚠️ **Errores comunes:**\n• No completar todas las pasadas\n• Olvidar variable temporal en swap\n• Comparar fuera del rango del arreglo",
+  ejercicio:"✏️ **Ejercicio:** Aplica Bubble Sort manualmente:\n[7, 2, 9, 4, 1]\n\nMuestra el arreglo después de cada intercambio. ¿Cuántos intercambios totales?"
+}
 };
 
-// ═══════════════════════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════════════════════
-const quizBank = {
-  "Algoritmos básicos":[
-    {q:"¿Qué es un algoritmo?",opts:["Un programa ejecutable","Pasos ordenados para resolver un problema","Un tipo de variable","Un diagrama"],ans:1,exp:"Un algoritmo es una secuencia finita y ordenada de pasos que resuelve un problema."},
-    {q:"¿Cuál es una característica esencial?",opts:["Ser muy largo","Ser preciso y finito","Tener pasos ambiguos","Solo funcionar en PC"],ans:1,exp:"Todo algoritmo debe ser preciso (sin ambigüedades) y finito (debe terminar)."},
-    {q:"¿Cuántas salidas puede tener?",opts:["Exactamente una","Ninguna","Una o más","Solo dos"],ans:2,exp:"Un algoritmo puede tener cero, una o más salidas según el problema."},
-  ],
-  "Pseudocódigo":[
-    {q:"¿Para qué sirve el pseudocódigo?",opts:["Ejecutar programas","Describir algoritmos en lenguaje natural","Diseñar bases de datos","Crear imágenes"],ans:1,exp:"El pseudocódigo describe algoritmos en lenguaje intermedio, sin sintaxis estricta."},
-    {q:"¿Qué símbolo se usa para asignar un valor?",opts:["==","=","<-","=>"],ans:2,exp:"La flecha <- representa asignación: guardamos un valor en una variable."},
-    {q:"¿Qué palabra se usa para mostrar datos?",opts:["RETURN","MOSTRAR o ESCRIBIR","GOTO","RUN"],ans:1,exp:"MOSTRAR, ESCRIBIR o IMPRIMIR se usan para representar la salida de datos."},
-  ],
-  "Diagramas de flujo":[
-    {q:"¿Qué figura representa una decisión?",opts:["Rectángulo","Óvalo","Rombo","Paralelogramo"],ans:2,exp:"El rombo (diamante) representa una condición o decisión en el diagrama."},
-    {q:"¿Qué figura indica inicio o fin?",opts:["Rectángulo","Rombo","Óvalo o cápsula","Flecha"],ans:2,exp:"El óvalo o cápsula marca el inicio y fin del algoritmo."},
-    {q:"¿Qué figura representa un proceso?",opts:["Rombo","Óvalo","Rectángulo","Flecha"],ans:2,exp:"El rectángulo representa una operación o instrucción de procesamiento."},
-  ],
-  "Variables y tipos de datos":[
-    {q:"¿Qué es una variable?",opts:["Un valor fijo","Un espacio en memoria que guarda un valor","Un tipo de ciclo","Una función"],ans:1,exp:"Una variable es un espacio en memoria identificado con un nombre que puede cambiar su valor."},
-    {q:"¿Cuál es un tipo entero?",opts:["3.14","'Hola'","42","Verdadero"],ans:2,exp:"Los números enteros (sin decimales) como 42 son de tipo int."},
-    {q:"¿Qué tipo almacena texto?",opts:["int","float","String","boolean"],ans:2,exp:"El tipo String almacena texto como nombres o frases."},
-  ],
-  "Estructuras de control":[
-    {q:"¿Qué hace SI-SINO?",opts:["Repite código","Toma decisiones según condición","Declara variables","Define funciones"],ans:1,exp:"SI-SINO evalúa una condición y ejecuta un bloque u otro según el resultado."},
-    {q:"¿Cuándo se ejecuta el bloque SI si la condición es FALSA?",opts:["Una vez","Siempre","Nunca","Dos veces"],ans:2,exp:"Si la condición es falsa, el bloque SI no se ejecuta; se pasa al SINO."},
-    {q:"¿Cuándo usamos SEGÚN SEA (switch)?",opts:["Para ciclos","Para múltiples valores posibles","Para funciones","Para arreglos"],ans:1,exp:"SEGÚN SEA es útil cuando una variable puede tomar varios valores distintos."},
-  ],
-  "Ciclos y bucles":[
-    {q:"¿Diferencia entre FOR y WHILE?",opts:["No hay","FOR cuando conoces iteraciones, WHILE cuando no","WHILE es más rápido","FOR solo con números"],ans:1,exp:"FOR se usa cuando conoces el número de repeticiones. WHILE depende de una condición."},
-    {q:"¿Qué es un ciclo infinito?",opts:["Corre infinito veces exactas","La condición de parada nunca se cumple","Un ciclo muy rápido","Un tipo de función"],ans:1,exp:"Un ciclo infinito ocurre cuando su condición de parada nunca se vuelve falsa."},
-    {q:"¿Cuál ciclo se ejecuta al menos una vez?",opts:["FOR","WHILE","DO-WHILE","Ninguno"],ans:2,exp:"El ciclo DO-WHILE ejecuta el bloque primero y verifica la condición al final."},
-  ],
-  "Arreglos y listas":[
-    {q:"¿Qué es un arreglo?",opts:["Un tipo de ciclo","Colección de elementos del mismo tipo","Un operador","Una función"],ans:1,exp:"Un arreglo almacena múltiples valores del mismo tipo accesibles por índice."},
-    {q:"¿Desde qué índice empiezan los arreglos?",opts:["1","0","-1","10"],ans:1,exp:"En Java, Python, C++ y la mayoría de lenguajes, los arreglos comienzan en el índice 0."},
-    {q:"¿Cómo se accede al tercer elemento de 'nums'?",opts:["nums[3]","nums[2]","nums(3)","nums{2}"],ans:1,exp:"El tercer elemento está en el índice 2 (porque se empieza en 0): nums[2]."},
-  ],
-  "Funciones":[
-    {q:"¿Para qué sirve una función?",opts:["Crear variables","Agrupar código reutilizable","Hacer ciclos más rápidos","Definir tipos de datos"],ans:1,exp:"Una función agrupa instrucciones bajo un nombre para reutilizarlas en distintos puntos."},
-    {q:"¿Qué es el valor de retorno?",opts:["El nombre","El resultado que devuelve","Los parámetros","Las líneas de código"],ans:1,exp:"El valor de retorno (RETORNAR) es el resultado que la función entrega a quien la llamó."},
-    {q:"¿Qué son los parámetros?",opts:["El nombre","Variables locales","Datos que recibe la función","El tipo de retorno"],ans:2,exp:"Los parámetros son los datos de entrada que recibe la función para realizar su tarea."},
-  ],
-  "Búsqueda":[
-    {q:"¿Qué hace la búsqueda lineal?",opts:["Divide el arreglo","Revisa elemento por elemento","Ordena primero","Usa fórmula matemática"],ans:1,exp:"La búsqueda lineal recorre el arreglo uno por uno hasta encontrar el elemento."},
-    {q:"¿La búsqueda binaria requiere que el arreglo esté...?",opts:["Desordenado","Ordenado","Vacío","Con pares"],ans:1,exp:"La búsqueda binaria solo funciona en arreglos ordenados."},
-    {q:"¿Cuál es más eficiente en arreglos grandes?",opts:["Lineal siempre","Binaria en arreglos ordenados","Ambas igual","Depende"],ans:1,exp:"La búsqueda binaria es O(log n), mucho más eficiente que la lineal O(n)."},
-  ],
-  "Ordenamiento":[
-    {q:"¿Qué hace Bubble Sort?",opts:["Busca el menor","Compara pares adyacentes e intercambia desordenados","Divide el arreglo","Inserta uno por uno"],ans:1,exp:"Bubble Sort compara elementos vecinos e intercambia los que están en orden incorrecto."},
-    {q:"¿Complejidad de Bubble Sort en el peor caso?",opts:["O(n)","O(log n)","O(n²)","O(1)"],ans:2,exp:"En el peor caso Bubble Sort compara todos los pares posibles: O(n²)."},
-    {q:"¿Qué hace el ordenamiento por Selección?",opts:["Compara vecinos","Encuentra el mínimo y lo coloca al inicio","Divide y conquista","Inserta en posición"],ans:1,exp:"El ordenamiento por Selección busca el mínimo en cada pasada y lo coloca en su posición."},
-  ],
-};
-
-// Respuestas a preguntas frecuentes
-const FAQ = [
-  {keys:["qué es","que es","define","definición","definicion","concepto"],action:"intro"},
-  {keys:["ejemplo","muestra","muéstrame","ilustra","código","pseudocódigo","pseudocodigo"],action:"ejemplo"},
-  {keys:["error","errores","falla","fallas","equivocación","equivocacion","problema","problemas"],action:"errores"},
-  {keys:["ejercicio","practica","práctica","actividad","tarea","problema para"],action:"ejercicio"},
-  {keys:["hola","buenos","buenas","hey","hi"],action:"greet"},
-  {keys:["gracias","thank","excelente","perfecto","entendí","entendi","claro"],action:"thanks"},
-  {keys:["no entiendo","no entendí","no entendi","confundido","confundida","dificil","difícil"],action:"retry"},
+var FAQ=[
+  {keys:["qué es","que es","define","concepto","qué son","que son"],act:"intro"},
+  {keys:["ejemplo","muéstrame","muestra","código","pseudocodigo"],act:"ejemplo"},
+  {keys:["error","errores","falla","problema"],act:"errores"},
+  {keys:["ejercicio","práctica","practica","actividad","tarea"],act:"ejercicio"},
+  {keys:["hola","buenos","buenas","hey"],act:"greet"},
+  {keys:["gracias","excelente","perfecto","entendí","claro"],act:"thanks"},
+  {keys:["no entiendo","confundido","difícil","no comprendo"],act:"retry"}
 ];
 
-// ═══════════════════════════════════════════════════════
-// ESTADO
-// ═══════════════════════════════════════════════════════
-let currentTopic = "Algoritmos básicos";
-let stats = {msgs:0, quizDone:0, correct:0, wrong:0, streak:0};
-let explored = new Set(["Algoritmos básicos"]);
-let quizList = [], quizIdx = 0, currentQ = null;
+// ── QUIZ BANK ──────────────────────────────────────
+var QB={
+"Algoritmos básicos":[
+  {q:"¿Qué es un algoritmo?",o:["Un programa ejecutable","Pasos ordenados para resolver un problema","Un tipo de variable","Un diagrama"],a:1,e:"Un algoritmo es una secuencia finita y ordenada de pasos que resuelve un problema."},
+  {q:"¿Cuál es una característica esencial de un algoritmo?",o:["Ser muy largo","Ser preciso y finito","Tener pasos ambiguos","Solo funcionar en PC"],a:1,e:"Todo algoritmo debe ser preciso y finito."},
+  {q:"¿Cuántas salidas puede tener un algoritmo?",o:["Exactamente una","Ninguna","Una o más","Solo dos"],a:2,e:"Un algoritmo puede tener cero, una o más salidas."}
+],
+"Pseudocódigo":[
+  {q:"¿Para qué sirve el pseudocódigo?",o:["Ejecutar programas","Describir algoritmos en lenguaje natural","Diseñar bases de datos","Crear imágenes"],a:1,e:"El pseudocódigo describe algoritmos sin sintaxis estricta de programación."},
+  {q:"¿Qué símbolo se usa para asignar un valor en pseudocódigo?",o:["==","=","<-","=>"],a:2,e:"La flecha <- representa asignación de valor."},
+  {q:"¿Qué palabra se usa para mostrar datos al usuario?",o:["RETURN","MOSTRAR o ESCRIBIR","GOTO","RUN"],a:1,e:"MOSTRAR o ESCRIBIR representan la salida de datos."}
+],
+"Diagramas de flujo":[
+  {q:"¿Qué figura representa una decisión?",o:["Rectángulo","Óvalo","Rombo","Paralelogramo"],a:2,e:"El rombo representa una condición o decisión."},
+  {q:"¿Qué figura indica inicio o fin del algoritmo?",o:["Rectángulo","Rombo","Óvalo o cápsula","Flecha"],a:2,e:"El óvalo o cápsula marca el inicio y fin."},
+  {q:"¿Qué figura representa un proceso o cálculo?",o:["Rombo","Óvalo","Rectángulo","Flecha"],a:2,e:"El rectángulo representa un proceso."}
+],
+"Variables y tipos de datos":[
+  {q:"¿Qué es una variable?",o:["Un valor fijo","Un espacio en memoria que guarda un valor","Un tipo de ciclo","Una función"],a:1,e:"Una variable es un espacio en memoria que puede cambiar de valor."},
+  {q:"¿Cuál es un ejemplo de tipo entero?",o:["3.14","'Hola'","42","Verdadero"],a:2,e:"Los números enteros como 42 son de tipo int."},
+  {q:"¿Qué tipo de dato almacena texto?",o:["int","float","String","boolean"],a:2,e:"El tipo String almacena texto."}
+],
+"Estructuras de control":[
+  {q:"¿Qué hace la estructura SI-SINO?",o:["Repite código","Toma decisiones según condición","Declara variables","Define funciones"],a:1,e:"SI-SINO evalúa una condición y ejecuta un bloque u otro."},
+  {q:"Si la condición del SI es FALSA ¿qué ocurre?",o:["Se ejecuta una vez","Siempre se ejecuta","El bloque SI no se ejecuta","Se ejecuta dos veces"],a:2,e:"Si la condición es falsa, el bloque SI no se ejecuta."},
+  {q:"¿Cuándo es útil SEGÚN SEA (switch)?",o:["Para ciclos","Para múltiples valores posibles de una variable","Para funciones","Para arreglos"],a:1,e:"SEGÚN SEA es útil para múltiples valores posibles de una variable."}
+],
+"Ciclos y bucles":[
+  {q:"¿Cuál es la diferencia entre FOR y WHILE?",o:["No hay diferencia","FOR cuando conoces iteraciones, WHILE cuando no","WHILE es más rápido","FOR solo funciona con números"],a:1,e:"FOR cuando sabes el número de repeticiones, WHILE cuando depende de una condición."},
+  {q:"¿Qué es un ciclo infinito?",o:["Un ciclo que corre exactamente infinito veces","Un ciclo cuya condición de parada nunca se cumple","Un ciclo muy rápido","Un tipo de función"],a:1,e:"Ciclo infinito: su condición de parada nunca se vuelve falsa."},
+  {q:"¿Cuál ciclo se ejecuta al menos una vez siempre?",o:["FOR","WHILE","DO-WHILE","Ninguno"],a:2,e:"DO-WHILE ejecuta el bloque primero y verifica la condición al final."}
+],
+"Arreglos y listas":[
+  {q:"¿Qué es un arreglo?",o:["Un tipo de ciclo","Colección de elementos del mismo tipo bajo un nombre","Un operador matemático","Una función"],a:1,e:"Un arreglo almacena múltiples valores del mismo tipo accesibles por índice."},
+  {q:"¿Desde qué índice empiezan los arreglos en la mayoría de lenguajes?",o:["1","0","-1","10"],a:1,e:"Los arreglos empiezan en el índice 0."},
+  {q:"¿Cómo se accede al tercer elemento de un arreglo 'nums'?",o:["nums[3]","nums[2]","nums(3)","nums{2}"],a:1,e:"El tercer elemento está en el índice 2: nums[2]."}
+],
+"Funciones":[
+  {q:"¿Para qué sirve una función?",o:["Crear variables","Agrupar código reutilizable","Hacer ciclos más rápidos","Definir tipos de datos"],a:1,e:"Una función agrupa instrucciones para reutilizarlas."},
+  {q:"¿Qué es el valor de retorno de una función?",o:["El nombre de la función","El resultado que devuelve al terminar","Los parámetros","Las líneas de código"],a:1,e:"El valor de retorno es el resultado que la función entrega al llamador."},
+  {q:"¿Qué son los parámetros de una función?",o:["El nombre","Variables locales","Datos que recibe la función para trabajar","El tipo de retorno"],a:2,e:"Los parámetros son los datos de entrada que recibe la función."}
+],
+"Búsqueda":[
+  {q:"¿Qué hace la búsqueda lineal?",o:["Divide el arreglo a la mitad","Revisa elemento por elemento","Ordena el arreglo primero","Usa una fórmula matemática"],a:1,e:"La búsqueda lineal recorre el arreglo uno por uno."},
+  {q:"¿La búsqueda binaria requiere que el arreglo esté...?",o:["Desordenado","Ordenado","Vacío","Con números pares"],a:1,e:"La búsqueda binaria solo funciona en arreglos ordenados."},
+  {q:"¿Cuál algoritmo de búsqueda es más eficiente en arreglos grandes?",o:["Lineal siempre","Binaria en arreglos ordenados","Son igual de eficientes","Ninguno"],a:1,e:"Binaria es O(log n), mucho más eficiente que lineal O(n)."}
+],
+"Ordenamiento":[
+  {q:"¿Qué hace Bubble Sort?",o:["Busca el elemento menor","Compara pares adyacentes e intercambia los desordenados","Divide el arreglo en mitades","Inserta uno por uno"],a:1,e:"Bubble Sort compara pares vecinos e intercambia los desordenados."},
+  {q:"¿Cuál es la complejidad de Bubble Sort en el peor caso?",o:["O(n)","O(log n)","O(n²)","O(1)"],a:2,e:"En el peor caso Bubble Sort es O(n²)."},
+  {q:"¿Qué hace el ordenamiento por Selección?",o:["Compara pares vecinos","Encuentra el mínimo y lo coloca al inicio en cada pasada","Divide y conquista","Inserta en posición correcta"],a:1,e:"Selection Sort busca el mínimo en cada pasada y lo coloca en su posición."}
+]
+};
 
-// ═══════════════════════════════════════════════════════
-// CHAT FUNCTIONS
-// ═══════════════════════════════════════════════════════
-function addMsg(role, text) {
-  const container = document.getElementById("chatMsgs");
-  const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  const isBot = role === "bot";
-  div.innerHTML = `
-    <div class="avatar ${isBot?'bot-av':'user-av'}">${isBot?'🤖':'👤'}</div>
-    <div class="bubble ${isBot?'bot-bubble':'user-bubble'}">${formatText(text)}</div>
-  `;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+// ── BUS-11 ─────────────────────────────────────────
+var BUSITEMS=[
+  {id:1,dim:"facilidad",txt:"Este chatbot fue fácil de usar."},
+  {id:2,dim:"utilidad",txt:"El chatbot me ayudó a aprender sobre algoritmos."},
+  {id:3,dim:"facilidad",txt:"Podría usar este chatbot sin necesitar ayuda de nadie."},
+  {id:4,dim:"satisfaccion",txt:"Me gustó interactuar con este chatbot."},
+  {id:5,dim:"utilidad",txt:"El chatbot respondió mis preguntas de manera útil."},
+  {id:6,dim:"confianza",txt:"Confío en la información que me proporcionó el chatbot."},
+  {id:7,dim:"facilidad",txt:"Fue fácil encontrar la información que necesitaba."},
+  {id:8,dim:"satisfaccion",txt:"Recomendaría este chatbot a mis compañeros de clase."},
+  {id:9,dim:"utilidad",txt:"El chatbot me ayudó a comprender mejor los algoritmos."},
+  {id:10,dim:"confianza",txt:"Me sentí cómodo/a usando este chatbot para aprender."},
+  {id:11,dim:"satisfaccion",txt:"En general, estoy satisfecho/a con la experiencia de uso."}
+];
+var BUSDIMS={
+  facilidad:{lbl:"Facilidad de Uso",items:[1,3,7],max:15},
+  utilidad:{lbl:"Utilidad",items:[2,5,9],max:15},
+  satisfaccion:{lbl:"Satisfacción",items:[4,8,11],max:15},
+  confianza:{lbl:"Confianza",items:[6,10],max:10}
+};
+
+// ── ESTADO ─────────────────────────────────────────
+var PASS="cbtis159";
+var student="",topic="Algoritmos básicos";
+var st={msgs:0,quiz:0,ok:0,bad:0,strk:0,maxStrk:0,pts:0,tops:new Set()};
+var ql=[],qi=0,cq=null;
+var busAns={},busQ=0,busDone=false;
+
+// ── STORAGE ────────────────────────────────────────
+function gStud(){try{return JSON.parse(localStorage.getItem("ab_students")||"[]");}catch(e){return[];}}
+function gBus(){try{return JSON.parse(localStorage.getItem("ab_bus11")||"[]");}catch(e){return[];}}
+function saveStud(){
+  var all=gStud();
+  var pct=st.quiz>0?Math.round(st.ok/st.quiz*100):0;
+  var r={name:student,pts:st.pts,quiz:st.quiz,ok:st.ok,bad:st.bad,msgs:st.msgs,
+    maxStrk:st.maxStrk,pct:pct,tops:st.tops.size,topList:[...st.tops].join(", "),
+    bus:busDone?"Completado":"Pendiente",dt:new Date().toLocaleString("es-MX")};
+  var i=all.findIndex(function(x){return x.name===student;});
+  if(i>=0)all[i]=r;else all.push(r);
+  localStorage.setItem("ab_students",JSON.stringify(all));
 }
 
-function formatText(t) {
-  t = t.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
-  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
-  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  t = t.replace(/\n/g, '<br>');
+// ── LOGIN ──────────────────────────────────────────
+function login(){
+  var n=document.getElementById("nameIn").value.trim();
+  if(!n){document.getElementById("nameIn").style.borderColor="var(--red)";return;}
+  student=n;
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("app").classList.add("show");
+  document.getElementById("hname").textContent=n;
+  loadQuiz("Algoritmos básicos");
+  addMsg("bot","¡Hola, **"+n+"**! 👋 Bienvenido a AlgoBot del **CBTIS 159**.\n\nSoy el asistente de la **Dra. María Flores Luévanos**.\n\n⭐ **Puntos extra:**\n• +1 por quiz correcto\n• +2 por racha de 3\n• +3 por racha de 5\n• +5 por racha de 10\n\n📋 Al terminar, completa el cuestionario **BUS-11** (menú izquierdo).\n\n¡Elige un tema y empecemos! 🚀");
+}
+function logout(){
+  if(confirm("¿Deseas salir? Tu progreso se guardará.")){saveStud();location.reload();}
+}
+
+// ── PASS MODAL ────────────────────────────────────
+function openPassModal(){
+  document.getElementById("passModal").classList.add("show");
+  document.getElementById("passIn").value="";
+  document.getElementById("passErr").style.display="none";
+  setTimeout(function(){document.getElementById("passIn").focus();},80);
+}
+function closePassModal(){document.getElementById("passModal").classList.remove("show");}
+function checkPass(){
+  if(document.getElementById("passIn").value===PASS){closePassModal();openTeacher();}
+  else{document.getElementById("passErr").style.display="block";}
+}
+
+// ── TEACHER PANEL ─────────────────────────────────
+function openTeacher(){saveStud();renderTab1();document.getElementById("tpanel").classList.add("show");}
+function closeTeacher(){document.getElementById("tpanel").classList.remove("show");}
+function showTab(n){
+  document.getElementById("tab1").style.display=n===1?"block":"none";
+  document.getElementById("tab2").style.display=n===2?"block":"none";
+  document.getElementById("tab1btn").classList.toggle("on",n===1);
+  document.getElementById("tab2btn").classList.toggle("on",n===2);
+  if(n===2)renderTab2();
+}
+function renderTab1(){
+  var all=gStud();all.sort(function(a,b){return b.pts-a.pts;});
+  var tot=all.length;
+  var avgP=tot>0?(all.reduce(function(s,x){return s+x.pts;},0)/tot).toFixed(1):0;
+  var avgA=tot>0?(all.reduce(function(s,x){return s+x.pct;},0)/tot).toFixed(1):0;
+  var tQ=all.reduce(function(s,x){return s+x.quiz;},0);
+  document.getElementById("tpStats").innerHTML=
+    '<div class="tpcard"><div class="tpval">'+tot+'</div><div class="tplbl">Alumnos</div></div>'+
+    '<div class="tpcard"><div class="tpval" style="color:var(--yellow)">'+avgP+'⭐</div><div class="tplbl">Pts promedio</div></div>'+
+    '<div class="tpcard"><div class="tpval" style="color:var(--green)">'+avgA+'%</div><div class="tplbl">Aciertos prom.</div></div>'+
+    '<div class="tpcard"><div class="tpval" style="color:var(--purple)">'+tQ+'</div><div class="tplbl">Quiz totales</div></div>';
+  document.getElementById("tpUpd").textContent="Act: "+new Date().toLocaleString("es-MX");
+  var tb=document.getElementById("tpBody");
+  if(!all.length){tb.innerHTML='<tr><td colspan="10" class="nodata">📭 Aún no hay alumnos registrados.</td></tr>';return;}
+  tb.innerHTML=all.map(function(s,i){
+    var med=i===0?'<span style="color:#fcd34d;font-weight:700">🥇 1°</span>':i===1?'<span style="color:#94a3b8;font-weight:700">🥈 2°</span>':i===2?'<span style="color:#cd853f;font-weight:700">🥉 3°</span>':(i+1)+"°";
+    var pc=s.pct>=70?"var(--green)":s.pct>=50?"var(--yellow)":"var(--red)";
+    var bc=s.bus==="Completado"?"var(--green)":"var(--muted)";
+    return "<tr><td>"+med+"</td>"+
+      "<td><strong>"+s.name+"</strong></td>"+
+      "<td><span class='pbadge'>"+s.pts+" ⭐</span></td>"+
+      "<td>"+s.quiz+"</td>"+
+      "<td><div class='minibar'><div class='minifill'><div class='minifill-inner' style='width:"+s.pct+"%'></div></div><span style='font-family:monospace;color:"+pc+";font-weight:700'>"+s.pct+"%</span></div></td>"+
+      "<td>"+s.maxStrk+"🔥</td>"+
+      "<td>"+s.msgs+"</td>"+
+      "<td>"+s.tops+" temas</td>"+
+      "<td style='color:"+bc+";font-size:.8rem;font-weight:600'>"+s.bus+"</td>"+
+      "<td style='font-size:.71rem;color:var(--muted)'>"+s.dt+"</td></tr>";
+  }).join("");
+}
+function renderTab2(){
+  var r=gBus();
+  var bs=document.getElementById("busStats");
+  if(r.length){
+    var aT=(r.reduce(function(s,x){return s+x.total;},0)/r.length).toFixed(1);
+    var aF=(r.reduce(function(s,x){return s+x.facilidad;},0)/r.length).toFixed(1);
+    var aU=(r.reduce(function(s,x){return s+x.utilidad;},0)/r.length).toFixed(1);
+    var aS=(r.reduce(function(s,x){return s+x.satisfaccion;},0)/r.length).toFixed(1);
+    bs.innerHTML='<div class="tpcard"><div class="tpval">'+r.length+'</div><div class="tplbl">Encuestas</div></div>'+
+      '<div class="tpcard"><div class="tpval" style="color:var(--green)">'+aT+'/55</div><div class="tplbl">Puntaje prom.</div></div>'+
+      '<div class="tpcard"><div class="tpval" style="color:var(--accent)">'+aF+'/15</div><div class="tplbl">Facilidad prom.</div></div>'+
+      '<div class="tpcard"><div class="tpval" style="color:var(--yellow)">'+aS+'/15</div><div class="tplbl">Satisfacción prom.</div></div>';
+  } else {
+    bs.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted)">Aún no hay encuestas BUS-11.</div>';
+  }
+  var tb=document.getElementById("busBody");
+  if(!r.length){tb.innerHTML='<tr><td colspan="8" class="nodata">📭 Ningún alumno ha completado el BUS-11 aún.</td></tr>';return;}
+  tb.innerHTML=r.map(function(x){
+    var p=Math.round(x.total/55*100);
+    var c=p>=91?"var(--green)":p>=71?"var(--accent)":p>=51?"var(--yellow)":"var(--red)";
+    return "<tr><td><strong>"+x.name+"</strong></td>"+
+      "<td><div class='minibar'><div class='minifill'><div class='minifill-inner' style='width:"+p+"%'></div></div><span style='font-family:monospace;color:"+c+";font-weight:700'>"+x.total+"/55</span></div></td>"+
+      "<td style='color:"+c+";font-weight:600;font-size:.79rem'>"+x.nivel+"</td>"+
+      "<td style='font-family:monospace;color:var(--accent)'>"+x.facilidad+"/15</td>"+
+      "<td style='font-family:monospace;color:var(--accent)'>"+x.utilidad+"/15</td>"+
+      "<td style='font-family:monospace;color:var(--accent)'>"+x.satisfaccion+"/15</td>"+
+      "<td style='font-family:monospace;color:var(--accent)'>"+x.confianza+"/10</td>"+
+      "<td style='font-size:.71rem;color:var(--muted)'>"+x.dt+"</td></tr>";
+  }).join("");
+}
+function exportCSV(){
+  var all=gStud();var bus=gBus();
+  all.sort(function(a,b){return b.pts-a.pts;});
+  var h=["#","Alumno","Pts Extra","Quiz","% Aciertos","Racha Max","Preguntas","Temas","BUS-11 Total","Facilidad","Utilidad","Satisfacción","Confianza","Última Actividad"];
+  var csv="\uFEFF"+h.join(",")+"\n";
+  all.forEach(function(s,i){
+    var b=bus.find(function(x){return x.name===s.name;});
+    var row=[i+1,s.name,s.pts,s.quiz,s.pct+"%",s.maxStrk,s.msgs,s.tops,
+      b?b.total+"/55":"Pendiente",b?b.facilidad+"/15":"—",b?b.utilidad+"/15":"—",
+      b?b.satisfaccion+"/15":"—",b?b.confianza+"/10":"—",s.dt];
+    csv+=row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",")+"\n";
+  });
+  csv+='\n"RESUMEN"\n"Total alumnos","'+all.length+'"\n"Encuestas BUS-11","'+bus.length+'"\n';
+  csv+='"Fecha","'+new Date().toLocaleString("es-MX")+'"\n"Maestra","Dra. María Flores Luévanos"\n"Grupo","CBTIS 159 - 2 Semestre"\n';
+  var blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download="AlgoBot_Reporte_"+new Date().toLocaleDateString("es-MX").replace(/\//g,"-")+".csv";
+  a.click();URL.revokeObjectURL(url);
+}
+
+// ── BUS-11 ─────────────────────────────────────────
+function openBus(){
+  if(busDone){alert("Ya completaste el BUS-11. ¡Gracias!");return;}
+  busAns={};busQ=0;
+  document.getElementById("busOverlay").classList.add("show");
+  renderBusQ();
+}
+function closeBus(){document.getElementById("busOverlay").classList.remove("show");}
+function renderBusQ(){
+  var el=document.getElementById("busContent");
+  var total=BUSITEMS.length;
+  if(busQ>=total){renderBusResult(el);return;}
+  var item=BUSITEMS[busQ];
+  var ans=busAns[item.id];
+  var pct=Math.round(busQ/total*100);
+  var dim=BUSDIMS[item.dim];
+  var html='<div class="busintro">📋 <strong>Instrucciones:</strong> Indica tu nivel de acuerdo del <strong>1 (Totalmente en desacuerdo)</strong> al <strong>5 (Totalmente de acuerdo)</strong>. No hay respuestas correctas o incorrectas. 🙏</div>';
+  html+='<div class="busprog"><div class="busprogbar"><div class="busproginner" style="width:'+pct+'%"></div></div><span class="busprogtxt">'+busQ+'/'+total+'</span></div>';
+  html+='<div class="busqnum">Pregunta '+item.id+' de '+total+' · '+dim.lbl+'</div>';
+  html+='<div class="busqtxt">'+item.txt+'</div>';
+  html+='<div class="busscale">';
+  for(var v=1;v<=5;v++){html+='<button class="sbtn2'+(ans===v?' sel':'')+'" onclick="selBus('+item.id+','+v+')">'+v+'</button>';}
+  html+='</div>';
+  html+='<div class="buslbls"><span class="buslbl">Totalmente en desacuerdo</span><span class="buslbl">Neutral</span><span class="buslbl">Totalmente de acuerdo</span></div>';
+  html+='<div class="busnav">';
+  if(busQ>0)html+='<button class="busprev" onclick="busNav(-1)">← Anterior</button>';
+  html+='<button class="busnext"'+(ans?'':' disabled')+' onclick="busNav(1)">'+(busQ<total-1?'Siguiente →':'Ver mis resultados ✓')+'</button>';
+  html+='</div>';
+  el.innerHTML=html;
+}
+function selBus(id,v){busAns[id]=v;renderBusQ();}
+function busNav(d){busQ+=d;if(busQ<0)busQ=0;renderBusQ();}
+function renderBusResult(el){
+  var tot=BUSITEMS.reduce(function(s,x){return s+(busAns[x.id]||0);},0);
+  var dims={};
+  Object.keys(BUSDIMS).forEach(function(k){
+    var d=BUSDIMS[k];
+    var sc=d.items.reduce(function(a,id){return a+(busAns[id]||0);},0);
+    dims[k]={sc:sc,max:d.max,pct:Math.round(sc/d.max*100),lbl:d.lbl};
+  });
+  var nivel,nc,nd;
+  if(tot>=50){nivel="🏆 Excelente usabilidad";nc="var(--green)";nd="¡AlgoBot ofrece una experiencia sobresaliente!";}
+  else if(tot>=39){nivel="✅ Buena usabilidad";nc="var(--accent)";nd="AlgoBot ofrece una buena experiencia con áreas de mejora menores.";}
+  else if(tot>=28){nivel="⚠️ Usabilidad aceptable";nc="var(--yellow)";nd="La herramienta es funcional pero puede mejorar.";}
+  else{nivel="❌ Baja usabilidad";nc="var(--red)";nd="Se recomienda revisar la interfaz y el contenido.";}
+  busDone=true;
+  var rec={name:student,total:tot,nivel:nivel.replace(/[^\w\sÀ-ú]/g,"").trim(),
+    facilidad:dims.facilidad.sc,utilidad:dims.utilidad.sc,
+    satisfaccion:dims.satisfaccion.sc,confianza:dims.confianza.sc,
+    ans:Object.assign({},busAns),dt:new Date().toLocaleString("es-MX")};
+  var all=gBus();
+  var ix=all.findIndex(function(x){return x.name===student;});
+  if(ix>=0)all[ix]=rec;else all.push(rec);
+  localStorage.setItem("ab_bus11",JSON.stringify(all));
+  saveStud();
+  var dh=Object.values(dims).map(function(d){
+    var c=d.pct>=80?"var(--green)":d.pct>=60?"var(--accent)":d.pct>=40?"var(--yellow)":"var(--red)";
+    return '<div class="dimcard"><div class="dimlbl">'+d.lbl+'</div><div class="dimval" style="color:'+c+'">'+d.sc+'/'+d.max+' <span style="font-size:.68rem;color:var(--muted)">('+d.pct+'%)</span></div></div>';
+  }).join("");
+  el.innerHTML='<div class="busresult">'+
+    '<div class="scorecircle"><div class="scorenum">'+tot+'</div><div class="scoremax">de 55</div></div>'+
+    '<div class="buslevel" style="color:'+nc+'">'+nivel+'</div>'+
+    '<div class="busdesc">'+nd+'</div>'+
+    '<div class="dimgrid">'+dh+'</div>'+
+    '<div class="busthx">✅ <strong>¡Gracias, '+student+'!</strong> Tu evaluación fue guardada. La Dra. Flores Luévanos podrá consultarla en el panel de maestra. 🙏</div>'+
+    '<button class="busclose" onclick="closeBus()">Cerrar y seguir aprendiendo →</button>'+
+    '</div>';
+}
+
+// ── CHAT ───────────────────────────────────────────
+function fmt(t){
+  t=t.replace(/```([\s\S]*?)```/g,'<pre>$1</pre>');
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\n/g,'<br>');
   return t;
 }
-
-function showTyping() {
-  const container = document.getElementById("chatMsgs");
-  const div = document.createElement("div");
-  div.className = "msg bot"; div.id = "typing";
-  div.innerHTML = `<div class="avatar bot-av">🤖</div><div class="bubble bot-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+function addMsg(role,text){
+  var c=document.getElementById("chatMsgs"),d=document.createElement("div");
+  d.className="msg "+role;
+  var b=role==="bot";
+  d.innerHTML='<div class="av '+(b?"bav":"uav")+'">'+(b?"🤖":"👤")+'</div><div class="bub '+(b?"bbub":"ubub")+'">'+fmt(text)+'</div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
-
-function removeTyping() {
-  const t = document.getElementById("typing");
-  if(t) t.remove();
+function addToast(t){
+  var c=document.getElementById("chatMsgs"),d=document.createElement("div");
+  d.className="toast";d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
-
-function sendMsg(text) {
-  const input = document.getElementById("userInput");
-  const msg = (text || input.value).trim();
-  if(!msg) return;
-  input.value = "";
-  input.style.height = "auto";
-  addMsg("user", msg);
-  stats.msgs++;
-  explored.add(currentTopic);
-  updateStats();
-  updateExplored();
-  document.getElementById("sendBtn").disabled = true;
-  showTyping();
-  setTimeout(() => {
-    removeTyping();
-    const response = getBotResponse(msg);
-    addMsg("bot", response);
-    document.getElementById("sendBtn").disabled = false;
-  }, 600 + Math.random()*400);
+function showTyping(){
+  var c=document.getElementById("chatMsgs"),d=document.createElement("div");
+  d.className="msg bot";d.id="typing";
+  d.innerHTML='<div class="av bav">🤖</div><div class="bub bbub"><div class="typing-wrap"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
+function remTyping(){var t=document.getElementById("typing");if(t)t.remove();}
 
-function getBotResponse(msg) {
-  const lower = msg.toLowerCase();
-  // Detectar acción
-  for(const faq of FAQ) {
-    if(faq.keys.some(k => lower.includes(k))) {
-      if(faq.action === "greet") return `¡Hola! 👋 Estoy aquí para ayudarte con **${currentTopic}**.\n¿Qué quieres aprender hoy? Puedes preguntarme cualquier cosa o usar los botones de la izquierda 😊`;
-      if(faq.action === "thanks") return `¡De nada! 😊 Me alegra haberte ayudado.\n¿Hay algo más que quieras saber sobre **${currentTopic}** u otro tema? ¡Estoy aquí! 🚀`;
-      if(faq.action === "retry") return `¡No te preocupes! Lo explicamos de otra forma 💪\n\n${KB[currentTopic]?.intro || "Selecciona un tema en el menú izquierdo y lo explico desde cero."}\n\n¿Quedó más claro? Si no, ¡pregunta lo que sea! 😊`;
-      const data = KB[currentTopic];
-      if(data && data[faq.action]) return data[faq.action];
+function send(txt){
+  var inp=document.getElementById("userIn");
+  var msg=(txt||inp.value).trim();if(!msg)return;
+  inp.value="";inp.style.height="auto";
+  addMsg("user",msg);st.msgs++;st.tops.add(topic);
+  updateUI();document.getElementById("sendBtn").disabled=true;showTyping();
+  setTimeout(function(){remTyping();addMsg("bot",getResp(msg));document.getElementById("sendBtn").disabled=false;saveStud();},500+Math.random()*400);
+}
+function getResp(msg){
+  var low=msg.toLowerCase();
+  for(var i=0;i<FAQ.length;i++){
+    var f=FAQ[i];
+    if(f.keys.some(function(k){return low.includes(k);})){
+      if(f.act==="greet")return"¡Hola, **"+student+"**! 👋 ¿Qué quieres aprender sobre **"+topic+"**? 😊";
+      if(f.act==="thanks")return"¡De nada! 😊 ¿Algo más sobre **"+topic+"** u otro tema? 🚀";
+      if(f.act==="retry")return"¡No te preocupes! 💪\n\n"+(KB[topic]?KB[topic].intro:"Selecciona un tema.")+"\n\n¿Quedó más claro? 😊";
+      if(KB[topic]&&KB[topic][f.act])return KB[topic][f.act];
     }
   }
-  // Detectar temas mencionados
-  for(const topic of Object.keys(KB)) {
-    if(lower.includes(topic.toLowerCase())) {
-      return KB[topic].intro;
-    }
-  }
-  // Respuesta del tema actual
-  const data = KB[currentTopic];
-  if(data) {
-    if(lower.includes("para qué") || lower.includes("para que") || lower.includes("sirve") || lower.includes("usa"))
-      return data.intro;
-    return `Sobre **${currentTopic}**, aquí te explico:\n\n${data.intro}\n\n¿Quieres que te dé un ejemplo, hablemos de errores comunes, o prefieres un ejercicio? 😊`;
-  }
-  return `Sobre "${msg}", te recomiendo revisar el tema **${currentTopic}** seleccionado.\n\nPuedes preguntarme:\n• "¿Qué es ${currentTopic}?"\n• "Dame un ejemplo de ${currentTopic}"\n• "¿Cuáles son los errores comunes?"\n• "Dame un ejercicio"\n\n¡Estoy aquí para ayudarte! 🤖`;
+  var ks=Object.keys(KB);
+  for(var j=0;j<ks.length;j++){if(low.includes(ks[j].toLowerCase()))return KB[ks[j]].intro;}
+  if(KB[topic])return"Sobre **"+topic+"**:\n\n"+KB[topic].intro+"\n\n¿Quieres un ejemplo, errores comunes o un ejercicio? 😊";
+  return"Selecciona un tema y te explico. Puedes preguntarme:\n• ¿Qué es "+topic+"?\n• Dame un ejemplo\n• Errores comunes\n• Dame un ejercicio 🤖";
+}
+function quick(type){
+  var data=KB[topic];if(!data)return;
+  var lbl={intro:"Explícame "+topic,ejemplo:"Ejemplo de "+topic,errores:"Errores comunes en "+topic,ejercicio:"Ejercicio de "+topic};
+  addMsg("user",lbl[type]);st.msgs++;st.tops.add(topic);updateUI();showTyping();
+  setTimeout(function(){remTyping();addMsg("bot",data[type]||data.intro);saveStud();},400+Math.random()*300);
 }
 
-function quickAction(type) {
-  const data = KB[currentTopic];
-  if(!data) return;
-  const labels = {intro:"Explícame "+currentTopic, ejemplo:"Dame un ejemplo de "+currentTopic, errores:"¿Cuáles son los errores comunes en "+currentTopic+"?", ejercicio:"Dame un ejercicio de "+currentTopic};
-  addMsg("user", labels[type]);
-  stats.msgs++;
-  explored.add(currentTopic);
-  updateStats();
-  updateExplored();
-  document.getElementById("sendBtn").disabled = true;
-  showTyping();
-  setTimeout(() => {
-    removeTyping();
-    addMsg("bot", data[type] || data.intro);
-    document.getElementById("sendBtn").disabled = false;
-  }, 500 + Math.random()*300);
-}
-
-// ═══════════════════════════════════════════════════════
-// TOPIC
-// ═══════════════════════════════════════════════════════
-function selectTopic(btn, topic, icon) {
-  document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
+// ── TOPIC ──────────────────────────────────────────
+function selTopic(btn,t,icon){
+  document.querySelectorAll(".tbtn").forEach(function(b){b.classList.remove("active");});
   btn.classList.add("active");
-  currentTopic = topic;
-  explored.add(topic);
-  document.getElementById("s-topic").textContent = icon + " " + topic.split(" ")[0];
-  loadQuiz(topic);
+  topic=t;st.tops.add(t);
+  document.getElementById("sTopic").textContent=icon+" "+t.split(" ")[0];
+  loadQuiz(t);updateExplored();
+  addMsg("user","Quiero aprender sobre "+t);
+  st.msgs++;updateUI();showTyping();
+  setTimeout(function(){remTyping();addMsg("bot",KB[t]?KB[t].intro:"Tema no disponible.");saveStud();},400);
+}
+
+// ── QUIZ ───────────────────────────────────────────
+function loadQuiz(t){
+  var k=Object.keys(QB).find(function(x){return t.includes(x)||x.includes(t.split(" ")[0]);});
+  ql=k?QB[k].slice():QB["Algoritmos básicos"].slice();qi=0;renderQuiz();
+}
+function renderQuiz(){
+  cq=ql[qi];
+  document.getElementById("quizQ").textContent=cq.q;
+  var el=document.getElementById("quizOpts");el.innerHTML="";
+  cq.o.forEach(function(op,i){
+    var b=document.createElement("button");b.className="qopt";b.textContent=op;
+    b.onclick=function(){checkAns(i);};el.appendChild(b);
+  });
+  document.getElementById("quizFb").className="fb";
+  document.getElementById("nxtBtn").className="nxtbtn";
+}
+function checkAns(idx){
+  var opts=document.querySelectorAll(".qopt");
+  opts.forEach(function(b){b.disabled=true;});
+  var isOk=idx===cq.a;
+  opts[idx].classList.add(isOk?"ok":"bad");
+  if(!isOk)opts[cq.a].classList.add("ok");
+  st.quiz++;
+  if(isOk){
+    st.ok++;st.strk++;if(st.strk>st.maxStrk)st.maxStrk=st.strk;
+    var p=1,m="✅ ¡Correcto! +1 punto ⭐";
+    if(st.strk===3){p+=2;m="✅ ¡Correcto! 🔥 ¡Racha de 3! +3 pts ⭐⭐⭐";}
+    else if(st.strk===5){p+=3;m="✅ ¡Correcto! 🔥🔥 ¡Racha de 5! +4 pts ⭐⭐⭐⭐";}
+    else if(st.strk===10){p+=5;m="✅ ¡Correcto! 🏆 ¡Racha de 10! +6 pts ⭐⭐⭐⭐⭐⭐";}
+    st.pts+=p;setTimeout(function(){addToast(m);},100);
+  }else{st.bad++;st.strk=0;}
+  var fb=document.getElementById("quizFb");
+  fb.textContent=(isOk?"✅ ¡Correcto! ":"❌ Incorrecto. ")+cq.e;
+  fb.className="fb show "+(isOk?"fok":"fbad");
+  document.getElementById("nxtBtn").className="nxtbtn show";
+  updateUI();saveStud();
+}
+function nextQ(){qi=(qi+1)%ql.length;renderQuiz();}
+
+// ── UI ─────────────────────────────────────────────
+function updateUI(){
+  var pct=st.quiz>0?Math.round(st.ok/st.quiz*100):0;
+  document.getElementById("sMsgs").textContent=st.msgs;
+  document.getElementById("sQuiz").textContent=st.quiz;
+  document.getElementById("sPct").textContent=pct+"%";
+  document.getElementById("sStrk").textContent=st.strk+"🔥";
+  document.getElementById("sPts").textContent=st.pts+"⭐";
+  document.getElementById("rMsgs").textContent=st.msgs;
+  document.getElementById("rQuiz").textContent=st.quiz;
+  document.getElementById("rOk").textContent=st.ok;
+  document.getElementById("rBad").textContent=st.bad;
+  document.getElementById("rMax").textContent=st.maxStrk+"🔥";
+  document.getElementById("pfill").style.width=pct+"%";
+  document.getElementById("plbl").textContent=pct+"%";
+  document.getElementById("strkNum").textContent=st.strk;
+  document.getElementById("hpts").textContent=st.pts;
+  document.getElementById("sidePts").textContent=st.pts+" ⭐";
   updateExplored();
-  addMsg("user", "Quiero aprender sobre " + topic);
-  stats.msgs++;
-  updateStats();
-  showTyping();
-  setTimeout(() => {
-    removeTyping();
-    addMsg("bot", KB[topic]?.intro || "Tema no disponible aún.");
-  }, 500);
 }
-
-// ═══════════════════════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════════════════════
-function loadQuiz(topic) {
-  const key = Object.keys(quizBank).find(k => topic.includes(k) || k.includes(topic.split(" ")[0]));
-  quizList = key ? [...quizBank[key]] : [...quizBank["Algoritmos básicos"]];
-  quizIdx = 0;
-  renderQuiz();
-}
-
-function renderQuiz() {
-  currentQ = quizList[quizIdx];
-  document.getElementById("quizQ").textContent = currentQ.q;
-  const opts = document.getElementById("quizOpts");
-  opts.innerHTML = "";
-  currentQ.opts.forEach((o,i) => {
-    const b = document.createElement("button");
-    b.className = "quiz-opt"; b.textContent = o;
-    b.onclick = () => checkAnswer(i);
-    opts.appendChild(b);
-  });
-  document.getElementById("quizFeedback").className = "feedback";
-  document.getElementById("nextBtn").className = "next-btn";
-}
-
-function checkAnswer(idx) {
-  const opts = document.querySelectorAll(".quiz-opt");
-  opts.forEach(b => b.disabled = true);
-  const ok = idx === currentQ.ans;
-  opts[idx].classList.add(ok ? "correct" : "wrong");
-  if(!ok) opts[currentQ.ans].classList.add("correct");
-  stats.quizDone++;
-  if(ok) { stats.correct++; stats.streak++; }
-  else   { stats.wrong++;   stats.streak = 0; }
-  const fb = document.getElementById("quizFeedback");
-  fb.textContent = (ok ? "✅ ¡Correcto! " : "❌ Incorrecto. ") + currentQ.exp;
-  fb.className = "feedback show " + (ok ? "ok" : "bad");
-  document.getElementById("nextBtn").className = "next-btn show";
-  updateStats();
-}
-
-function nextQuiz() {
-  quizIdx = (quizIdx + 1) % quizList.length;
-  renderQuiz();
-}
-
-// ═══════════════════════════════════════════════════════
-// STATS
-// ═══════════════════════════════════════════════════════
-function updateStats() {
-  const pct = stats.quizDone > 0 ? Math.round(stats.correct/stats.quizDone*100) : 0;
-  document.getElementById("s-msgs").textContent    = stats.msgs;
-  document.getElementById("s-quiz").textContent    = stats.quizDone;
-  document.getElementById("s-pct").textContent     = pct + "%";
-  document.getElementById("s-streak").textContent  = stats.streak + "🔥";
-  document.getElementById("r-msgs").textContent    = stats.msgs;
-  document.getElementById("r-quiz").textContent    = stats.quizDone;
-  document.getElementById("r-ok").textContent      = stats.correct;
-  document.getElementById("r-bad").textContent     = stats.wrong;
-  document.getElementById("progFill").style.width  = pct + "%";
-  document.getElementById("progLabel").textContent = pct + "%";
-  document.getElementById("streakNum").textContent = stats.streak;
-}
-
-function updateExplored() {
-  const c = document.getElementById("exploredTags");
-  if(explored.size === 0) return;
-  const icons = {"Algoritmos básicos":"🔤","Pseudocódigo":"📝","Diagramas de flujo":"🔄","Variables y tipos de datos":"📦","Estructuras de control":"🔀","Ciclos y bucles":"🔁","Arreglos y listas":"📋","Funciones":"🧩","Búsqueda":"🔍","Ordenamiento":"📊"};
-  c.innerHTML = "";
-  explored.forEach(t => {
-    const s = document.createElement("span");
-    s.className = "tag";
-    s.textContent = (icons[t]||"📌") + " " + t.split(" ")[0];
-    c.appendChild(s);
+function updateExplored(){
+  var icons={"Algoritmos básicos":"🔤","Pseudocódigo":"📝","Diagramas de flujo":"🔄","Variables y tipos de datos":"📦","Estructuras de control":"🔀","Ciclos y bucles":"🔁","Arreglos y listas":"📋","Funciones":"🧩","Búsqueda":"🔍","Ordenamiento":"📊"};
+  var c=document.getElementById("expTags");
+  if(!st.tops.size)return;c.innerHTML="";
+  st.tops.forEach(function(t){
+    var s=document.createElement("span");s.className="tag";
+    s.textContent=(icons[t]||"📌")+" "+t.split(" ")[0];c.appendChild(s);
   });
 }
-
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-loadQuiz("Algoritmos básicos");
-addMsg("bot", `¡Hola! Soy **AlgoBot** 🤖, el asistente de algoritmos del **CBTIS 159**.\n\nRecurso didáctico de la **Dra. María Flores Luévanos** · 2° Semestre.\n\nPuedo ayudarte a:\n• 📖 **Explicar** cualquier tema de algoritmos\n• 💡 **Mostrar ejemplos** con pseudocódigo\n• 🧪 **Practicar** con el quiz de la derecha\n• ✅ **Resolver** tus dudas\n\n¡Elige un tema en la barra izquierda o escríbeme directamente! 🚀`);
 </script>
 </body>
 </html>
